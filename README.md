@@ -1,5 +1,7 @@
 # Figma Design Checker
 
+> Part of [Mobile DevTools](https://github.com/RevylAI/mobile-devtools) — open-source tools for mobile engineering teams.
+
 **Verify your app matches the design.** Pull frames from Figma, screenshot the real app on a cloud device, pixel-diff them. Catch design drift before it ships.
 
 ---

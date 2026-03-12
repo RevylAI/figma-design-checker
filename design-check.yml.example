@@ -1,0 +1,181 @@
+name: Design Compliance Check
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      figma_file_key:
+        description: "Figma file key or URL"
+        required: true
+        type: string
+      platform:
+        description: "Device platform"
+        required: false
+        default: "android"
+        type: choice
+        options:
+          - android
+          - ios
+      threshold:
+        description: "Diff threshold (0-1)"
+        required: false
+        default: "0.05"
+        type: string
+      frame_filter:
+        description: "Comma-separated frame names to check (blank = all)"
+        required: false
+        default: ""
+        type: string
+
+env:
+  FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+  REVYL_API_KEY: ${{ secrets.REVYL_API_KEY }}
+  REVYL_APP_ID: ${{ secrets.REVYL_APP_ID }}
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  design-check:
+    name: Compare Figma vs App
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ----------------------------------------------------------------
+      # Setup
+      # ----------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Revyl CLI
+        run: |
+          curl -fsSL https://get.revyl.ai | sh
+          echo "$HOME/.revyl/bin" >> $GITHUB_PATH
+
+      # ----------------------------------------------------------------
+      # Resolve inputs (workflow_dispatch vs PR defaults)
+      # ----------------------------------------------------------------
+      - name: Set configuration
+        id: config
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "figma_key=${{ inputs.figma_file_key }}" >> "$GITHUB_OUTPUT"
+            echo "platform=${{ inputs.platform }}" >> "$GITHUB_OUTPUT"
+            echo "threshold=${{ inputs.threshold }}" >> "$GITHUB_OUTPUT"
+            echo "frame_filter=${{ inputs.frame_filter }}" >> "$GITHUB_OUTPUT"
+          else
+            # PR trigger — use defaults from repository variables or hardcoded fallback
+            echo "figma_key=${{ vars.FIGMA_FILE_KEY }}" >> "$GITHUB_OUTPUT"
+            echo "platform=android" >> "$GITHUB_OUTPUT"
+            echo "threshold=0.05" >> "$GITHUB_OUTPUT"
+            echo "frame_filter=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ----------------------------------------------------------------
+      # 1. Build the app (placeholder — replace with your build step)
+      # ----------------------------------------------------------------
+      - name: Build app
+        run: |
+          echo "Skipping build — using the latest uploaded build on Revyl."
+          echo "To add a build step, replace this with your build commands"
+          echo "and upload via: revyl build upload --platform ${{ steps.config.outputs.platform }} --app $REVYL_APP_ID --file app.apk --json --yes"
+
+      # ----------------------------------------------------------------
+      # 2. Fetch Figma frames
+      # ----------------------------------------------------------------
+      - name: Fetch Figma frames
+        run: |
+          FILTER_ARGS=""
+          if [ -n "${{ steps.config.outputs.frame_filter }}" ]; then
+            IFS=',' read -ra FRAMES <<< "${{ steps.config.outputs.frame_filter }}"
+            for frame in "${FRAMES[@]}"; do
+              FILTER_ARGS="$FILTER_ARGS --frame-filter \"$(echo "$frame" | xargs)\""
+            done
+          fi
+
+          eval python scripts/fetch_figma.py \
+            --file-key "${{ steps.config.outputs.figma_key }}" \
+            --output-dir figma_frames \
+            --scale 2 \
+            $FILTER_ARGS
+
+      # ----------------------------------------------------------------
+      # 3. Capture app screenshots via Revyl
+      # ----------------------------------------------------------------
+      - name: Capture app screenshots
+        run: |
+          python scripts/capture.py \
+            --platform ${{ steps.config.outputs.platform }} \
+            --app-id "$REVYL_APP_ID" \
+            --output-dir app_screenshots \
+            --screens screens.yaml
+
+      # ----------------------------------------------------------------
+      # 4. Generate diff report
+      # ----------------------------------------------------------------
+      - name: Generate compliance report
+        run: |
+          python scripts/diff.py \
+            --figma-dir figma_frames \
+            --app-dir app_screenshots \
+            --output-dir report \
+            --threshold ${{ steps.config.outputs.threshold }}
+
+      # ----------------------------------------------------------------
+      # 5. Upload report artifacts
+      # ----------------------------------------------------------------
+      - name: Upload report artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-compliance-report
+          path: |
+            report/
+            figma_frames/
+            app_screenshots/
+          retention-days: 30
+
+      # ----------------------------------------------------------------
+      # 6. Post results
+      # ----------------------------------------------------------------
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: design-compliance
+          path: report/report.md
+
+      - name: Write job summary
+        if: always()
+        run: |
+          if [ -f report/report.md ]; then
+            cat report/report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## Design Compliance Report" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Report generation failed. Check the workflow logs for details." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ----------------------------------------------------------------
+      # 7. Fail on low compliance (optional gate)
+      # ----------------------------------------------------------------
+      - name: Check compliance threshold
+        run: |
+          # Extract the overall fidelity from the markdown report
+          SCORE=$(grep -oP 'Overall Fidelity: \K[\d.]+' report/report.md || echo "0")
+          echo "Overall fidelity: ${SCORE}%"
+
+          # Fail the workflow if below 80%
+          if (( $(echo "$SCORE < 80" | bc -l) )); then
+            echo "::error::Design compliance score ${SCORE}% is below the 80% threshold."
+            exit 1
+          fi

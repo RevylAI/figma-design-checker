@@ -6,6 +6,20 @@
 
 ---
 
+## Example: Figma vs App vs Diff
+
+Here's what the checker produces for a single screen (Reminders — 90.2% fidelity, grade B):
+
+| Figma Frame | App Screenshot | Diff Overlay |
+|:-----------:|:--------------:|:------------:|
+| <img src="figma_export/reminders.png" width="250" /> | <img src="app_screenshots/reminders.png" width="250" /> | <img src="report/diffs/reminders_diff.png" width="250" /> |
+
+Green regions match the design. Red highlights where the implementation diverges. Each screen gets a fidelity score and letter grade.
+
+> **[View the full HTML report](https://fuzzy-adventure-p32rvlm.pages.github.io/)** with all 9 screens compared side-by-side.
+
+---
+
 ## How It Works
 
 ```
@@ -16,10 +30,10 @@ Figma File                Revyl Cloud Device            Report
    |                           |  Screenshot each         |  Generate scores
    |                           |                          |  HTML + Markdown
    v                           v                          v
-figma_frames/             app_screenshots/             report/
-   shop_home.png              shop_home.png              report.html
-   product_detail.png         product_detail.png         report.md
-   search.png                 search.png                 diffs/
+figma_export/             app_screenshots/             report/
+   home.png                   home.png                   report.html
+   sign_up.png                sign_up.png                report.md
+   sleep.png                  sleep.png                  diffs/
 ```
 
 Each screen gets a fidelity score measuring how closely the implementation matches the design. Differences are highlighted in a visual overlay: green where the app matches the Figma frame, red where it diverges.
@@ -70,24 +84,30 @@ Open `report/report.html` in a browser to see the results.
 ## Example Output
 
 ```
-Comparing 6 screen(s) ...
+Comparing 9 screen(s) ...
 
-  Shop Home
-    Pixel: 96.2% | Structural: 98.1% | Blended: 96.8% [A]
-  Product Detail
-    Pixel: 91.4% | Structural: 94.8% | Blended: 92.4% [B]
-  Search
-    Pixel: 88.7% | Structural: 93.2% | Blended: 90.1% [B]
-  Cart Empty
-    Pixel: 97.1% | Structural: 98.5% | Blended: 97.5% [A]
-  Cart With Items
-    Pixel: 85.3% | Structural: 90.1% | Blended: 86.7% [C]
-  Profile
-    Pixel: 94.0% | Structural: 96.3% | Blended: 94.7% [B]
+  Reminders
+    Pixel: 88.9% | Structural: 93.3% | Blended: 90.2% [B]
+  Sign Up
+    Pixel: 76.3% | Structural: 89.7% | Blended: 80.3% [C]
+  Home
+    Pixel: 64.2% | Structural: 87.8% | Blended: 71.3% [D]
+  Welcome
+    Pixel: 60.5% | Structural: 90.0% | Blended: 69.4% [F]
+  Sign Up And Sign In
+    Pixel: 61.4% | Structural: 87.6% | Blended: 69.3% [F]
+  Course Details
+    Pixel: 59.2% | Structural: 88.1% | Blended: 67.9% [F]
+  Choose Topic
+    Pixel: 49.5% | Structural: 84.7% | Blended: 60.1% [F]
+  Meditate V2
+    Pixel: 47.4% | Structural: 87.7% | Blended: 59.5% [F]
+  Sleep
+    Pixel: 16.9% | Structural: 75.0% | Blended: 34.3% [F]
 
 ============================================================
-  Overall Fidelity:  93.0%
-  Grade:             B
+  Overall Fidelity:  66.9%
+  Grade:             F
 ============================================================
 ```
 

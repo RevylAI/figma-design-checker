@@ -1,0 +1,62 @@
+# screens.yaml — Maps Figma frame names to app navigation steps.
+#
+# Each entry tells the capture script which Figma design frame corresponds
+# to which app screen, and how to navigate there on the device.
+#
+# Fields:
+#   figma_frame  - Exact name of the frame in the Figma file (case-sensitive)
+#   app_screen   - Short slug used for internal reference
+#   description  - Human-readable description of the screen
+#   steps        - Ordered list of Revyl CLI actions to reach the screen
+#   reset        - If true, press Home before navigating (default: false)
+
+screens:
+  - figma_frame: "Shop - Home"
+    app_screen: "shop_home"
+    description: "Main product grid showing all available items"
+    steps: []
+
+  - figma_frame: "Product - Detail"
+    app_screen: "product_detail"
+    description: "Individual product page with images, price, and description"
+    steps:
+      - action: tap
+        target: "Orchid Mantis"
+    reset: true
+
+  - figma_frame: "Search"
+    app_screen: "search"
+    description: "Search screen with results"
+    steps:
+      - action: tap
+        target: "Search tab"
+    reset: true
+
+  - figma_frame: "Cart - Empty"
+    app_screen: "cart_empty"
+    description: "Shopping cart with no items"
+    steps:
+      - action: tap
+        target: "Cart tab"
+    reset: true
+
+  - figma_frame: "Cart - With Items"
+    app_screen: "cart_with_items"
+    description: "Shopping cart containing one or more products"
+    steps:
+      - action: tap
+        target: "Orchid Mantis"
+      - action: tap
+        target: "Add to Cart"
+        pause: 1.5
+      - action: tap
+        target: "Cart tab"
+    reset: true
+
+  - figma_frame: "Profile"
+    app_screen: "profile"
+    description: "User profile and settings screen"
+    steps:
+      - action: tap
+        target: "Profile tab"
+    reset: true

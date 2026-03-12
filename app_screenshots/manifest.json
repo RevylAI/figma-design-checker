@@ -1,0 +1,47 @@
+[
+  {
+    "figma_frame": "sign up and Sign in",
+    "file": "sign_up_and_sign_in.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "sign up",
+    "file": "sign_up.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "welcome",
+    "file": "welcome.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "choose topic",
+    "file": "choose_topic.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "Reminders",
+    "file": "reminders.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "home",
+    "file": "home.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "sleep",
+    "file": "sleep.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "Meditate v2",
+    "file": "meditate_v2.png",
+    "status": "captured"
+  },
+  {
+    "figma_frame": "COURSE Details",
+    "file": "course_details.png",
+    "status": "captured"
+  }
+]

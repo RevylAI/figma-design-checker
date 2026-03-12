@@ -1,0 +1,79 @@
+# Sequential navigation flow through Silent Moon app.
+# Screens are captured in order — each builds on the previous state.
+# No resets needed since we follow the natural onboarding → main app flow.
+
+screens:
+  # 1. Landing — app launches here
+  - figma_frame: "sign up and Sign in"
+    app_screen: "sign_up_and_sign_in"
+    description: "Landing page"
+    steps: []
+
+  # 2. Sign Up — tap from landing
+  - figma_frame: "sign up"
+    app_screen: "sign_up"
+    description: "Sign up form"
+    steps:
+      - action: tap
+        target: "SIGN UP"
+
+  # 3. Welcome — tap GET STARTED from sign-up
+  - figma_frame: "welcome"
+    app_screen: "welcome"
+    description: "Welcome screen"
+    steps:
+      - action: tap
+        target: "GET STARTED"
+
+  # 4. Choose Topic — tap GET STARTED from welcome
+  - figma_frame: "choose topic"
+    app_screen: "choose_topic"
+    description: "Topic selection grid"
+    steps:
+      - action: tap
+        target: "GET STARTED"
+
+  # 5. Reminders — tap a topic card
+  - figma_frame: "Reminders"
+    app_screen: "reminders"
+    description: "Time and day picker"
+    steps:
+      - action: tap
+        target: "Reduce Stress"
+
+  # 6. Home — tap SAVE from reminders
+  - figma_frame: "home"
+    app_screen: "home"
+    description: "Home tab"
+    steps:
+      - action: tap
+        target: "SAVE"
+
+  # 7. Sleep — tap Sleep tab
+  - figma_frame: "sleep"
+    app_screen: "sleep"
+    description: "Sleep tab with stories"
+    steps:
+      - action: tap
+        target: "Sleep"
+        pause: 1.5
+
+  # 8. Meditate — tap Meditate tab
+  - figma_frame: "Meditate v2"
+    app_screen: "meditate_v2"
+    description: "Meditate tab"
+    steps:
+      - action: tap
+        target: "Meditate"
+        pause: 1.5
+
+  # 9. Course Details — go to Home, tap Basics card
+  - figma_frame: "COURSE Details"
+    app_screen: "course_details"
+    description: "Course detail page"
+    steps:
+      - action: tap
+        target: "Home"
+      - action: tap
+        target: "Basics"
+        pause: 1.5

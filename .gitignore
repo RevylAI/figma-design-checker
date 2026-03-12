@@ -24,12 +24,18 @@ env/
 .DS_Store
 Thumbs.db
 
-# Project outputs — screenshots and reports
-figma_frames/
-app_screenshots/
-report/
-
 # Secrets
 .env
 *.pem
 *.key
+
+# Sample app build artifacts
+sample-app/node_modules/
+sample-app/.expo/
+sample-app/ios/
+sample-app/build/
+sample-app/*.zip
+sample-app/package-lock.json
+
+# Test screenshots (temp)
+test_*.png

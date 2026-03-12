@@ -1,96 +1,72 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
-import { Colors } from '../../constants/theme';
-
-function TabIcon({ focused, label }: { focused: boolean; label: string }) {
-  return (
-    <View style={styles.tabItem}>
-      <View style={[styles.tabIcon, focused && styles.tabIconActive]} />
-      <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1}>
-        {label}
-      </Text>
-    </View>
-  );
-}
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../../constants/Colors';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: Colors.inkBlack,
-        tabBarInactiveTintColor: Colors.gray,
-        tabBarItemStyle: styles.tabBarItem,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.tabInactive,
+        tabBarStyle: {
+          backgroundColor: Colors.backgroundWhite,
+          borderTopColor: Colors.divider,
+          height: 85,
+          paddingTop: 8,
+          paddingBottom: 28,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Shop" />,
+          title: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="sleep"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Search" />,
+          title: 'Sleep',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="moon-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="specimens"
+        name="meditate"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Specimens" />,
+          title: 'Meditate',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="body-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="account"
+        name="music"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Account" />,
+          title: 'Music',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="musical-notes-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Afsar',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: Colors.paperWhite,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    height: 80,
-    paddingTop: 8,
-    paddingBottom: 20,
-    paddingHorizontal: 8,
-  },
-  tabBarItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tabItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    minWidth: 60,
-  },
-  tabIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    backgroundColor: '#eee',
-  },
-  tabIconActive: {
-    backgroundColor: Colors.stickerGreen,
-  },
-  tabLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: Colors.gray,
-    textAlign: 'center',
-  },
-  tabLabelActive: {
-    color: Colors.inkBlack,
-  },
-});

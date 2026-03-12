@@ -1,0 +1,7 @@
+project:
+  name: silent-moon
+
+build:
+  platforms:
+    ios:
+      output: build/Build/Products/Release-iphonesimulator/SilentMoon.app

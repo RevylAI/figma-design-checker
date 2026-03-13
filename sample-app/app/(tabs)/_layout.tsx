@@ -38,6 +38,15 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="moon-outline" size={size} color={color} />
           ),
+          tabBarStyle: {
+            backgroundColor: Colors.sleepDark,
+            borderTopColor: 'rgba(255,255,255,0.1)',
+            height: 85,
+            paddingTop: 8,
+            paddingBottom: 28,
+          },
+          tabBarActiveTintColor: Colors.primary,
+          tabBarInactiveTintColor: 'rgba(235,235,245,0.5)',
         }}
       />
       <Tabs.Screen

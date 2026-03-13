@@ -1,6 +1,6 @@
 ## Design Compliance Report
 
-**Overall Fidelity: 73.6% (Grade D)**
+**Overall Fidelity: 74.5% (Grade D)**
 
 Engine: pixelmatch (anti-aliasing aware, YIQ) | 9 screen(s) compared
 
@@ -13,7 +13,7 @@ Engine: pixelmatch (anti-aliasing aware, YIQ) | 9 screen(s) compared
 | Reminders | 92.2% | B | Pass |
 | Sign Up | 82.2% | C | Needs review |
 | Sign Up And Sign In | 78.9% | D | Needs review |
-| Sleep | 46.5% | F | Needs review |
+| Sleep | 54.6% | F | Needs review |
 | Welcome | 76.3% | D | Needs review |
 
 ### Grade Scale
@@ -26,4 +26,4 @@ Engine: pixelmatch (anti-aliasing aware, YIQ) | 9 screen(s) compared
 | D | 70 - 80% |
 | F | < 70% |
 
-*Generated on 2026-03-13 04:59:11 UTC*
+*Generated on 2026-03-13 18:42:16 UTC*

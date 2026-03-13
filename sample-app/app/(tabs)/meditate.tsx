@@ -32,7 +32,7 @@ export default function MeditateScreen() {
                     'happy-outline'
                   }
                   size={20}
-                  color={i === 0 ? '#FFFFFF' : '#A1A4B2'}
+                  color={i === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.85)'}
                 />
               </View>
               <Text style={[styles.chipLabel, i === 0 && styles.chipLabelActive]}>{cat}</Text>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.tabInactive,
+    backgroundColor: '#A1A4B2',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 6,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   gridImageContainer: {
     width: '100%',
-    height: CARD_WIDTH * 0.95,
+    height: CARD_WIDTH * 1.2,
     borderRadius: 12,
     overflow: 'hidden',
     position: 'relative',

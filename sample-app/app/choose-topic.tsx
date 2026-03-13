@@ -49,7 +49,7 @@ export default function ChooseTopicScreen() {
             style={[
               styles.card,
               { backgroundColor: item.color },
-              index % 2 === 1 && { marginTop: 20 },
+              index % 2 === 1 && { marginTop: 14 },
             ]}
           >
             {item.illustration && ILLUSTRATION_MAP[item.illustration] ? (
@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    width: 180,
-    height: 180,
+    width: 140,
+    height: 140,
   },
   heading: {
     fontSize: 28,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: CARD_WIDTH,
-    height: CARD_WIDTH * 1.2,
+    height: CARD_WIDTH * 1.25,
     borderRadius: 16,
     padding: 16,
     justifyContent: 'flex-end',

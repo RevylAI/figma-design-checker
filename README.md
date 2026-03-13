@@ -17,7 +17,7 @@ Here's what the checker produces — comparing Figma designs against a real app 
 | <img src="figma_export/course_details.png" width="220" /> | <img src="app_screenshots/course_details.png" width="220" /> | <img src="report/diffs/course_details_diff.png" width="220" /> |
 | Course Details — 84.6% (C) | | |
 | <img src="figma_export/sleep.png" width="220" /> | <img src="app_screenshots/sleep.png" width="220" /> | <img src="report/diffs/sleep_diff.png" width="220" /> |
-| Sleep — 54.0% (F) | | |
+| Sleep — 46.5% (F) | | |
 
 Red highlights where the implementation diverges from the design. Each screen gets a fidelity score and letter grade.
 

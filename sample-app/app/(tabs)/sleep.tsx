@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
@@ -61,12 +61,12 @@ export default function SleepScreen() {
           style={styles.featured}
           onPress={() => router.push('/welcome-sleep')}
         >
-          <View style={styles.featuredGradient}>
-            <Image
-              source={require('../../assets/images/sleep_ocean_scene_bitmap.png')}
-              style={styles.featuredBackgroundImage}
-              resizeMode="cover"
-            />
+          <ImageBackground
+            source={require('../../assets/images/sleep_ocean_scene_bitmap.png')}
+            style={styles.featuredGradient}
+            imageStyle={styles.featuredBackgroundImage}
+            resizeMode="cover"
+          >
             <View style={styles.lockIcon}>
               <Ionicons name="lock-closed" size={14} color="rgba(255,255,255,0.6)" />
             </View>
@@ -77,10 +77,10 @@ export default function SleepScreen() {
             <TouchableOpacity style={styles.featuredStartBtn}>
               <Text style={styles.featuredStartText}>START</Text>
             </TouchableOpacity>
-          </View>
+          </ImageBackground>
         </TouchableOpacity>
 
-        {/* Story cards grid - images have titles baked in */}
+        {/* Story cards grid */}
         <View style={styles.cardsRow}>
           <TouchableOpacity
             style={styles.storyCard}
@@ -91,6 +91,8 @@ export default function SleepScreen() {
               style={styles.storyFullImage}
               resizeMode="cover"
             />
+            <Text style={styles.storyTitle}>Night Island</Text>
+            <Text style={styles.storySub}>45 MIN • SLEEP MUSIC</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.storyCard}>
@@ -99,6 +101,8 @@ export default function SleepScreen() {
               style={styles.storyFullImage}
               resizeMode="cover"
             />
+            <Text style={styles.storyTitle}>Sweet Sleep</Text>
+            <Text style={styles.storySub}>45 MIN • SLEEP MUSIC</Text>
           </TouchableOpacity>
         </View>
 
@@ -193,21 +197,14 @@ const styles = StyleSheet.create({
   },
   featuredGradient: {
     padding: 24,
-    minHeight: 240,
+    minHeight: 260,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
     overflow: 'hidden',
     backgroundColor: '#586894',
   },
   featuredBackgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
+    borderRadius: 16,
   },
   lockIcon: {
     position: 'absolute',
@@ -259,5 +256,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: CARD_WIDTH * 1.05,
     borderRadius: 12,
+  },
+  storyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textLight,
+    marginTop: 8,
+  },
+  storySub: {
+    fontSize: 11,
+    color: 'rgba(235,235,245,0.5)',
+    marginTop: 2,
+    letterSpacing: 0.5,
   },
 });

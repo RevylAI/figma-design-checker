@@ -8,13 +8,18 @@
 
 ## Example: Figma vs App vs Diff
 
-Here's what the checker produces for a single screen (Reminders — 90.2% fidelity, grade B):
+Here's what the checker produces — comparing Figma designs against a real app running on a Revyl cloud device:
 
 | Figma Frame | App Screenshot | Diff Overlay |
 |:-----------:|:--------------:|:------------:|
-| <img src="figma_export/reminders.png" width="250" /> | <img src="app_screenshots/reminders.png" width="250" /> | <img src="report/diffs/reminders_diff.png" width="250" /> |
+| <img src="figma_export/reminders.png" width="220" /> | <img src="app_screenshots/reminders.png" width="220" /> | <img src="report/diffs/reminders_diff.png" width="220" /> |
+| Reminders — 92.2% (B) | | |
+| <img src="figma_export/course_details.png" width="220" /> | <img src="app_screenshots/course_details.png" width="220" /> | <img src="report/diffs/course_details_diff.png" width="220" /> |
+| Course Details — 84.6% (C) | | |
+| <img src="figma_export/sleep.png" width="220" /> | <img src="app_screenshots/sleep.png" width="220" /> | <img src="report/diffs/sleep_diff.png" width="220" /> |
+| Sleep — 54.0% (F) | | |
 
-Green regions match the design. Red highlights where the implementation diverges. Each screen gets a fidelity score and letter grade.
+Red highlights where the implementation diverges from the design. Each screen gets a fidelity score and letter grade.
 
 > **[View the full HTML report](https://revylai.github.io/figma-design-checker/)** with all 9 screens compared side-by-side.
 
@@ -84,30 +89,24 @@ Open `report/report.html` in a browser to see the results.
 ## Example Output
 
 ```
+Engine:  pixelmatch (anti-aliasing aware, YIQ)
+Masking: status bar masked (ios)
+
 Comparing 9 screen(s) ...
 
-  Reminders
-    Pixel: 88.9% | Structural: 93.3% | Blended: 90.2% [B]
-  Sign Up
-    Pixel: 76.3% | Structural: 89.7% | Blended: 80.3% [C]
-  Home
-    Pixel: 64.2% | Structural: 87.8% | Blended: 71.3% [D]
-  Welcome
-    Pixel: 60.5% | Structural: 90.0% | Blended: 69.4% [F]
-  Sign Up And Sign In
-    Pixel: 61.4% | Structural: 87.6% | Blended: 69.3% [F]
-  Course Details
-    Pixel: 59.2% | Structural: 88.1% | Blended: 67.9% [F]
-  Choose Topic
-    Pixel: 49.5% | Structural: 84.7% | Blended: 60.1% [F]
-  Meditate V2
-    Pixel: 47.4% | Structural: 87.7% | Blended: 59.5% [F]
-  Sleep
-    Pixel: 16.9% | Structural: 75.0% | Blended: 34.3% [F]
+  Reminders        92.2% [B]  ✅
+  Course Details   84.6% [C]
+  Sign Up          82.2% [C]
+  Sign Up & Sign In 78.9% [D]
+  Welcome          76.3% [D]
+  Home             74.1% [D]
+  Meditate V2      65.1% [F]
+  Choose Topic     57.4% [F]
+  Sleep            54.0% [F]
 
 ============================================================
-  Overall Fidelity:  66.9%
-  Grade:             F
+  Overall Fidelity:  73.9%
+  Grade:             D
 ============================================================
 ```
 
@@ -227,7 +226,8 @@ Set these secrets in your repository:
 
 - **[Revyl CLI](https://docs.revyl.ai)** — Cloud device provisioning and AI-grounded mobile interaction
 - **[Figma API](https://www.figma.com/developers/api)** — Design frame export
-- **[Pillow](https://pillow.readthedocs.io/)** — Image processing and pixel diffing
+- **[pixelmatch](https://github.com/nicgirault/pixelmatch-py)** — Anti-aliasing aware pixel diff (same engine as Playwright/Storybook)
+- **[Pillow](https://pillow.readthedocs.io/)** — Image processing (fallback diff)
 - **[Claude Code Action](https://docs.anthropic.com)** — Automated agent execution in CI
 
 ## License

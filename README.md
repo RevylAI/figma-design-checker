@@ -48,7 +48,7 @@ Each screen gets a fidelity score measuring how closely the implementation match
 ### Prerequisites
 
 - Python 3.10+
-- [Revyl CLI](https://docs.revyl.ai) installed and authenticated
+- [Revyl CLI](https://github.com/RevylAI/revyl-cli) installed and authenticated
 - A Figma personal access token ([generate one here](https://www.figma.com/developers/api#access-tokens))
 - An app build uploaded to Revyl
 
@@ -224,7 +224,7 @@ Set these secrets in your repository:
 
 ## Built With
 
-- **[Revyl CLI](https://docs.revyl.ai)** — Cloud device provisioning and AI-grounded mobile interaction
+- **[Revyl CLI](https://github.com/RevylAI/revyl-cli)** — Cloud device provisioning and AI-grounded mobile interaction
 - **[Figma API](https://www.figma.com/developers/api)** — Design frame export
 - **[pixelmatch](https://github.com/nicgirault/pixelmatch-py)** — Anti-aliasing aware pixel diff (same engine as Playwright/Storybook)
 - **[Pillow](https://pillow.readthedocs.io/)** — Image processing (fallback diff)

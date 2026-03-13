@@ -16,7 +16,7 @@ Here's what the checker produces for a single screen (Reminders — 90.2% fideli
 
 Green regions match the design. Red highlights where the implementation diverges. Each screen gets a fidelity score and letter grade.
 
-> **[View the full HTML report](https://fuzzy-adventure-p32rvlm.pages.github.io/)** with all 9 screens compared side-by-side.
+> **[View the full HTML report](https://revylai.github.io/figma-design-checker/)** with all 9 screens compared side-by-side.
 
 ---
 

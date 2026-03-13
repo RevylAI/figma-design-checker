@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import { COURSE_TRACKS } from '../constants/Data';
@@ -13,11 +12,13 @@ export default function CourseDetailsScreen() {
   return (
     <View style={styles.container}>
       {/* Hero image area */}
-      <LinearGradient
-        colors={['#F8C146', '#E8A020', '#3F414E']}
-        locations={[0, 0.5, 0.9]}
-        style={styles.hero}
-      >
+      <View style={styles.hero}>
+        <Image
+          source={require('../assets/images/course_header_illustration.png')}
+          style={styles.heroImage}
+          resizeMode="cover"
+        />
+
         {/* Back button */}
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color={Colors.textDark} />
@@ -32,34 +33,7 @@ export default function CourseDetailsScreen() {
             <Ionicons name="download-outline" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
-
-        {/* Sun illustration */}
-        <View style={styles.sunContainer}>
-          <View style={styles.sunBody} />
-          <View style={styles.sunFace}>
-            <View style={styles.sunEye} />
-            <View style={[styles.sunEye, { left: 30 }]} />
-            <View style={styles.sunSmile} />
-          </View>
-          {/* Rays */}
-          {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-            <View
-              key={deg}
-              style={[
-                styles.sunRay,
-                { transform: [{ rotate: `${deg}deg` }, { translateY: -55 }] },
-              ]}
-            />
-          ))}
-        </View>
-
-        {/* Feathers */}
-        <View style={styles.feather1} />
-        <View style={styles.feather2} />
-
-        {/* Clouds at bottom */}
-        <View style={styles.cloudBar} />
-      </LinearGradient>
+      </View>
 
       {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -125,8 +99,10 @@ const styles = StyleSheet.create({
     height: 300,
     position: 'relative',
     overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
   },
   backButton: {
     position: 'absolute',
@@ -155,81 +131,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(60,60,80,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  sunContainer: {
-    width: 100,
-    height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: -30,
-  },
-  sunBody: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#FFC97E',
-  },
-  sunFace: {
-    position: 'absolute',
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
-  },
-  sunEye: {
-    position: 'absolute',
-    width: 6,
-    height: 8,
-    borderRadius: 3,
-    backgroundColor: '#3F414E',
-    top: 28,
-    left: 20,
-  },
-  sunSmile: {
-    position: 'absolute',
-    width: 20,
-    height: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    backgroundColor: '#E8A020',
-    bottom: 18,
-    left: 25,
-  },
-  sunRay: {
-    position: 'absolute',
-    width: 3,
-    height: 18,
-    backgroundColor: '#3F414E',
-    borderRadius: 2,
-  },
-  feather1: {
-    position: 'absolute',
-    right: 80,
-    bottom: 100,
-    width: 10,
-    height: 30,
-    backgroundColor: 'rgba(255,255,255,0.6)',
-    borderRadius: 5,
-    transform: [{ rotate: '20deg' }],
-  },
-  feather2: {
-    position: 'absolute',
-    right: 60,
-    bottom: 120,
-    width: 8,
-    height: 25,
-    backgroundColor: 'rgba(255,255,255,0.4)',
-    borderRadius: 4,
-    transform: [{ rotate: '-10deg' }],
-  },
-  cloudBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 30,
-    backgroundColor: 'rgba(200,200,210,0.3)',
-    borderTopLeftRadius: 80,
-    borderTopRightRadius: 80,
   },
   content: {
     flex: 1,

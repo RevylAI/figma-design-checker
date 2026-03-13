@@ -1,5 +1,6 @@
 project:
   name: silent-moon
+  app_id: 111c2f18-7bbd-4b0e-acf3-75c0775c6e7a
 
 build:
   platforms:

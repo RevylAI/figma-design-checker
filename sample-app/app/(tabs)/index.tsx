@@ -1,8 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 
 const { width } = Dimensions.get('window');
@@ -34,12 +32,11 @@ export default function HomeScreen() {
             style={[styles.featureCard, { backgroundColor: Colors.cardPurple }]}
             onPress={() => router.push('/course-details')}
           >
-            <View style={styles.cardIllustration}>
-              <View style={styles.basicsBlobA} />
-              <View style={styles.basicsBlobB} />
-            </View>
-            <Text style={styles.cardTitle}>Basics</Text>
-            <Text style={styles.cardSubtitle}>COURSE</Text>
+            <Image
+              source={require('../../assets/images/home_basics_card_illustration.png')}
+              style={styles.cardFullImage}
+              resizeMode="cover"
+            />
             <View style={styles.cardBottom}>
               <Text style={styles.cardDuration}>3-10 MIN</Text>
               <TouchableOpacity style={styles.startButtonLight}>
@@ -52,56 +49,44 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[styles.featureCard, { backgroundColor: Colors.cardYellow }]}
           >
-            <View style={styles.cardIllustration}>
-              <View style={styles.relaxBlobA} />
-              <View style={styles.relaxBlobB} />
-            </View>
-            <Text style={[styles.cardTitle, { color: Colors.textDark }]}>Relaxation</Text>
-            <Text style={[styles.cardSubtitle, { color: Colors.textDark, opacity: 0.6 }]}>MUSIC</Text>
-            <View style={styles.cardBottom}>
-              <Text style={[styles.cardDuration, { color: Colors.textDark, opacity: 0.6 }]}>3-10 MIN</Text>
-              <TouchableOpacity style={styles.startButtonDark}>
-                <Text style={styles.startTextDark}>START</Text>
-              </TouchableOpacity>
-            </View>
+            <Image
+              source={require('../../assets/images/home_relaxation_card_illustration.png')}
+              style={styles.cardFullImage}
+              resizeMode="cover"
+            />
           </TouchableOpacity>
         </View>
 
         {/* Daily Thought banner */}
         <TouchableOpacity style={styles.dailyThought}>
-          <LinearGradient
-            colors={['#333242', '#44435A']}
-            style={styles.dailyGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
-            <View>
-              <Text style={styles.dailyTitle}>Daily Thought</Text>
-              <Text style={styles.dailySubtitle}>MEDITATION • 3-10 MIN</Text>
-            </View>
-            <View style={styles.playCircle}>
-              <Ionicons name="play" size={18} color={Colors.textDark} />
-            </View>
-          </LinearGradient>
+          <Image
+            source={require('../../assets/images/home_daily_thought_banner.png')}
+            style={styles.dailyBannerFull}
+            resizeMode="cover"
+          />
         </TouchableOpacity>
 
         {/* Recommended section */}
         <Text style={styles.sectionTitle}>Recomended for you</Text>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendedScroll}>
-          {/* Focus card */}
+          {/* Focus card - image has title+subtitle baked in */}
           <TouchableOpacity style={styles.recommendedCard}>
-            <View style={[styles.recommendedImage, { backgroundColor: '#A0E4CB' }]}>
-              <View style={styles.recIllustration1} />
-            </View>
-            <Text style={styles.recommendedTitle}>Focus</Text>
-            <Text style={styles.recommendedSub}>MEDITATION • 3-10 MIN</Text>
+            <Image
+              source={require('../../assets/images/home_focus_card_illustration_1.png')}
+              style={styles.recommendedFullImage}
+              resizeMode="cover"
+            />
           </TouchableOpacity>
 
-          {/* Happiness card */}
+          {/* Happiness card - image is illustration only */}
           <TouchableOpacity style={styles.recommendedCard}>
             <View style={[styles.recommendedImage, { backgroundColor: '#FFC97E' }]}>
-              <View style={styles.recIllustration2} />
+              <Image
+                source={require('../../assets/images/home_happiness_card_illustration.png')}
+                style={styles.recommendedIllustration}
+                resizeMode="cover"
+              />
             </View>
             <Text style={styles.recommendedTitle}>Happiness</Text>
             <Text style={styles.recommendedSub}>MEDITATION • 3-10 MIN</Text>
@@ -109,11 +94,11 @@ export default function HomeScreen() {
 
           {/* Third partial card */}
           <TouchableOpacity style={styles.recommendedCard}>
-            <View style={[styles.recommendedImage, { backgroundColor: '#A0E4CB' }]}>
-              <View style={styles.recIllustration1} />
-            </View>
-            <Text style={styles.recommendedTitle}>Focus</Text>
-            <Text style={styles.recommendedSub}>MEDITATION • 3-10 MIN</Text>
+            <Image
+              source={require('../../assets/images/home_focus_card_illustration_1.png')}
+              style={styles.recommendedFullImage}
+              resizeMode="cover"
+            />
           </TouchableOpacity>
         </ScrollView>
 
@@ -182,56 +167,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     overflow: 'hidden',
   },
-  cardIllustration: {
+  cardFullImage: {
     position: 'absolute',
-    top: 10,
+    top: 0,
     left: 0,
     right: 0,
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  basicsBlobA: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  basicsBlobB: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    position: 'absolute',
-    right: 30,
-    top: 5,
-  },
-  relaxBlobA: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
-  relaxBlobB: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    position: 'absolute',
-    left: 30,
-    top: 10,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textLight,
-  },
-  cardSubtitle: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
-    letterSpacing: 0.5,
-    marginTop: 4,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
   },
   cardBottom: {
     flexDirection: 'row',
@@ -270,33 +214,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 16,
     overflow: 'hidden',
-  },
-  dailyGradient: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
     height: 95,
   },
-  dailyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textLight,
-  },
-  dailySubtitle: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 0.5,
-    marginTop: 6,
-  },
-  playCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.textLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingLeft: 3,
+  dailyBannerFull: {
+    width: '100%',
+    height: '100%',
   },
   sectionTitle: {
     fontSize: 24,
@@ -321,17 +243,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  recIllustration1: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+  recommendedIllustration: {
+    width: '100%',
+    height: '100%',
   },
-  recIllustration2: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+  recommendedFullImage: {
+    width: 160,
+    height: 170,
+    borderRadius: 12,
   },
   recommendedTitle: {
     fontSize: 16,

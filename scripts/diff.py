@@ -3,6 +3,11 @@
 Compare Figma design frames against real app screenshots and generate a
 design-compliance report.
 
+Uses pixelmatch (anti-aliasing aware, perceptual YIQ color distance) when
+available, with a Pillow fallback. Automatically detects and masks the
+device status bar / notch region so clock, battery, and carrier UI don't
+skew the comparison.
+
 Handles resolution mismatches by resizing the Figma frame to match the
 device screenshot. Produces per-screen fidelity scores, an overall
 compliance grade, overlay diff images, and both HTML and Markdown reports.
@@ -12,7 +17,7 @@ Usage:
         --figma-dir figma_frames \
         --app-dir app_screenshots \
         --output-dir report \
-        --threshold 0.05
+        --threshold 0.1
 """
 
 from __future__ import annotations
@@ -28,6 +33,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter
+
+try:
+    from pixelmatch import pixelmatch as _pixelmatch
+
+    HAS_PIXELMATCH = True
+except ImportError:
+    HAS_PIXELMATCH = False
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -48,6 +60,14 @@ GRADE_COLORS: dict[str, str] = {
     "F": "#ef4444",
 }
 
+# Base status bar height at 1x scale (logical pixels).
+STATUS_BAR_HEIGHT_IOS = 54  # iPhone with Dynamic Island / notch
+STATUS_BAR_HEIGHT_ANDROID = 24
+
+# Reference height used to compute the scale factor.
+REFERENCE_HEIGHT = 844  # iPhone 14 logical height
+
+
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
@@ -64,6 +84,7 @@ class ScreenResult:
     figma_size: tuple[int, int] = (0, 0)
     app_size: tuple[int, int] = (0, 0)
     error: str | None = None
+    notch_masked: bool = False
 
 
 @dataclass
@@ -72,7 +93,8 @@ class Report:
     overall_fidelity: float = 0.0
     overall_grade: str = "F"
     timestamp: str = ""
-    threshold: float = 0.05
+    threshold: float = 0.1
+    engine: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -107,113 +129,200 @@ def image_to_data_uri(path: Path, max_width: int = 600) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Diff engine
+# Status bar / notch detection and masking
 # ---------------------------------------------------------------------------
 
 
+def _detect_has_status_bar(img: Image.Image) -> bool:
+    """
+    Heuristically detect whether an image has a device status bar.
+
+    Figma frames typically don't have a status bar (no clock, battery, etc.)
+    while real device screenshots always do. We detect this by examining the
+    top strip of the image for typical status bar indicators:
+    - Dark/light near-uniform bar at the top
+    - Dynamic Island (dark rounded rect) centered at the top
+    """
+    w, h = img.size
+    # Sample the top 5% of the image
+    strip_h = max(int(h * 0.05), 20)
+    top_strip = img.crop((0, 0, w, strip_h)).convert("RGB")
+
+    pixels = list(top_strip.getdata())
+    total = len(pixels)
+    if total == 0:
+        return False
+
+    # Check if there's a dark cluster in the center-top (Dynamic Island / notch)
+    center_x_start = w // 4
+    center_x_end = 3 * w // 4
+    dark_center_pixels = 0
+    for y in range(min(strip_h, 15)):
+        for x in range(center_x_start, center_x_end):
+            idx = y * w + x
+            if idx < total:
+                r, g, b = pixels[idx]
+                if r < 30 and g < 30 and b < 30:
+                    dark_center_pixels += 1
+
+    center_area = min(strip_h, 15) * (center_x_end - center_x_start)
+    if center_area > 0 and dark_center_pixels / center_area > 0.15:
+        return True  # Likely has a Dynamic Island or notch
+
+    # Check if the top strip has time-like patterns (mix of dark text on light bg)
+    avg_r = sum(p[0] for p in pixels) / total
+    avg_g = sum(p[1] for p in pixels) / total
+    avg_b = sum(p[2] for p in pixels) / total
+
+    # Count pixels that significantly differ from the average (text/icons)
+    varied = sum(
+        1
+        for p in pixels
+        if abs(p[0] - avg_r) > 40 or abs(p[1] - avg_g) > 40 or abs(p[2] - avg_b) > 40
+    )
+    # If more than 5% of pixels in the top strip are "varied" (text/icons), it's a status bar
+    if varied / total > 0.05:
+        return True
+
+    return False
+
+
+def _mask_status_bar(img: Image.Image, platform: str = "ios") -> Image.Image:
+    """Black out the status bar region so it doesn't affect the diff."""
+    base_h = STATUS_BAR_HEIGHT_IOS if platform == "ios" else STATUS_BAR_HEIGHT_ANDROID
+    # Scale proportionally based on image height
+    scale = img.size[1] / REFERENCE_HEIGHT
+    bar_h = max(int(base_h * scale), base_h)
+
+    masked = img.copy()
+    draw = ImageDraw.Draw(masked)
+    draw.rectangle([0, 0, img.size[0], bar_h], fill=(0, 0, 0))
+    return masked
+
+
+# ---------------------------------------------------------------------------
+# Diff engine — pixelmatch (primary) + Pillow fallback
+# ---------------------------------------------------------------------------
+
+
+def _compare_pixelmatch(
+    img_a: Image.Image,
+    img_b: Image.Image,
+    threshold: float = 0.1,
+) -> tuple[Image.Image, float, int]:
+    """
+    Compare two same-sized images using pixelmatch.
+
+    Returns (overlay_image, diff_percentage, changed_pixel_count).
+    """
+    w, h = img_a.size
+    a_rgba = img_a.convert("RGBA")
+    b_rgba = img_b.convert("RGBA")
+
+    img1_data = list(a_rgba.tobytes())
+    img2_data = list(b_rgba.tobytes())
+    diff_data = [0] * (w * h * 4)
+
+    changed_pixels = _pixelmatch(
+        img1_data,
+        img2_data,
+        w,
+        h,
+        output=diff_data,
+        threshold=threshold,
+        includeAA=False,  # skip anti-aliased pixels
+        alpha=0.1,
+        diff_color=(255, 0, 80),
+        aa_color=(255, 190, 0),
+    )
+
+    total_pixels = w * h
+    diff_pct = (changed_pixels / total_pixels) * 100.0 if total_pixels > 0 else 0.0
+
+    # Build overlay: composite diff highlights onto the app screenshot
+    diff_img = Image.frombytes("RGBA", (w, h), bytes(diff_data))
+    overlay = b_rgba.copy()
+    overlay = Image.alpha_composite(overlay, diff_img)
+
+    return overlay, diff_pct, changed_pixels
+
+
+def _compare_pillow_fallback(
+    img_a: Image.Image,
+    img_b: Image.Image,
+) -> tuple[Image.Image, float, int]:
+    """Fallback pixel differ using Pillow when pixelmatch is not installed."""
+    from PIL import ImageChops
+
+    a = img_a.convert("RGB")
+    b = img_b.convert("RGB")
+
+    raw_diff = ImageChops.difference(a, b)
+    gray_diff = raw_diff.convert("L")
+
+    # Threshold to ignore tiny sub-pixel differences
+    threshold_value = 10
+    binary_mask = gray_diff.point(lambda p: 255 if p > threshold_value else 0)
+    # Expand change regions by 9px for visibility
+    expanded = binary_mask.filter(ImageFilter.MaxFilter(size=9))
+    expanded_mask = expanded.point(lambda p: 255 if p > 0 else 0)
+
+    total_pixels = a.size[0] * a.size[1]
+    hist = expanded_mask.histogram()
+    changed_pixels = total_pixels - hist[0]
+    diff_pct = (changed_pixels / total_pixels) * 100.0 if total_pixels > 0 else 0.0
+
+    # Build overlay with red highlight on changed regions
+    overlay = b.copy().convert("RGBA")
+    highlight = Image.new("RGBA", overlay.size, (255, 0, 80, 0))
+    alpha_mask = expanded_mask.point(lambda p: 160 if p > 0 else 0)
+    highlight.putalpha(alpha_mask)
+    overlay = Image.alpha_composite(overlay, highlight)
+
+    return overlay, diff_pct, changed_pixels
+
+
 def compute_diff(
-    figma_path: Path,
-    app_path: Path,
+    figma_img: Image.Image,
+    app_img: Image.Image,
     output_path: Path,
-    threshold: float = 0.05,
-) -> tuple[float, Path]:
+    threshold: float = 0.1,
+    platform: str = "ios",
+    mask_statusbar: bool = True,
+) -> tuple[float, Path, bool]:
     """
-    Pixel-diff two images. Returns (fidelity_percentage, diff_image_path).
+    Pixel-diff two images. Returns (fidelity_pct, diff_image_path, notch_masked).
 
-    The Figma frame is resized to match the app screenshot dimensions so
-    that resolution differences don't skew the comparison.
-
-    Threshold controls per-channel tolerance: pixel channels differing by
-    less than ``threshold * 255`` are considered matching.
+    The Figma frame is resized to match the app screenshot dimensions.
+    Status bar is masked on both images if the app screenshot has one
+    but the Figma frame does not.
     """
-    figma_img = Image.open(figma_path).convert("RGB")
-    app_img = Image.open(app_path).convert("RGB")
-
     # Resize Figma frame to match device screenshot
     if figma_img.size != app_img.size:
         figma_img = figma_img.resize(app_img.size, Image.LANCZOS)
 
-    width, height = app_img.size
-    total_pixels = width * height
+    # Detect and handle status bar asymmetry
+    notch_masked = False
+    if mask_statusbar:
+        app_has_bar = _detect_has_status_bar(app_img)
+        figma_has_bar = _detect_has_status_bar(figma_img)
 
-    # Use numpy-style operations via raw bytes for performance
-    import struct
+        if app_has_bar:
+            # Always mask the app's status bar region
+            app_img = _mask_status_bar(app_img, platform)
+            figma_img = _mask_status_bar(figma_img, platform)
+            notch_masked = True
 
-    figma_bytes = figma_img.tobytes()
-    app_bytes = app_img.tobytes()
+    # Use the best available diff algorithm
+    if HAS_PIXELMATCH:
+        overlay, diff_pct, changed_px = _compare_pixelmatch(figma_img, app_img, threshold)
+    else:
+        overlay, diff_pct, changed_px = _compare_pillow_fallback(figma_img, app_img)
 
-    channel_threshold = int(threshold * 255)
-    matching_pixels = 0
-
-    diff_data = bytearray(width * height * 4)  # RGBA
-
-    for i in range(total_pixels):
-        offset_rgb = i * 3
-        offset_rgba = i * 4
-
-        fr, fg, fb = figma_bytes[offset_rgb], figma_bytes[offset_rgb + 1], figma_bytes[offset_rgb + 2]
-        ar, ag, ab = app_bytes[offset_rgb], app_bytes[offset_rgb + 1], app_bytes[offset_rgb + 2]
-
-        dr = abs(fr - ar)
-        dg = abs(fg - ag)
-        db = abs(fb - ab)
-
-        if dr <= channel_threshold and dg <= channel_threshold and db <= channel_threshold:
-            matching_pixels += 1
-            diff_data[offset_rgba] = 0
-            diff_data[offset_rgba + 1] = 200
-            diff_data[offset_rgba + 2] = 0
-            diff_data[offset_rgba + 3] = 40
-        else:
-            max_diff = max(dr, dg, db)
-            alpha = min(int(max_diff * 1.5), 220)
-            diff_data[offset_rgba] = 220
-            diff_data[offset_rgba + 1] = 40
-            diff_data[offset_rgba + 2] = 40
-            diff_data[offset_rgba + 3] = alpha
-
-    diff_img = Image.frombytes("RGBA", (width, height), bytes(diff_data))
-
-    fidelity = (matching_pixels / total_pixels) * 100.0 if total_pixels > 0 else 0.0
-
-    # Composite the diff overlay onto the app screenshot for context
-    overlay = app_img.copy().convert("RGBA")
-    overlay = Image.alpha_composite(overlay, diff_img)
+    fidelity = 100.0 - diff_pct
     overlay.save(output_path, "PNG")
 
-    return fidelity, output_path
-
-
-def compute_structural_similarity(figma_path: Path, app_path: Path) -> float:
-    """
-    Approximate structural similarity using a blurred-difference approach.
-
-    This is a lightweight proxy for SSIM that does not require scikit-image.
-    It blurs both images to suppress noise, then measures the mean absolute
-    difference of the blurred versions.
-    """
-    figma_img = Image.open(figma_path).convert("L")  # grayscale
-    app_img = Image.open(app_path).convert("L")
-
-    if figma_img.size != app_img.size:
-        figma_img = figma_img.resize(app_img.size, Image.LANCZOS)
-
-    # Apply Gaussian-like blur to focus on structure, not pixel noise
-    radius = 3
-    figma_blur = figma_img.filter(ImageFilter.GaussianBlur(radius=radius))
-    app_blur = app_img.filter(ImageFilter.GaussianBlur(radius=radius))
-
-    w, h = figma_blur.size
-
-    # Use raw bytes for fast iteration
-    fb_bytes = figma_blur.tobytes()
-    ab_bytes = app_blur.tobytes()
-
-    total_diff = sum(abs(fb_bytes[i] - ab_bytes[i]) for i in range(len(fb_bytes)))
-
-    max_possible = w * h * 255
-    similarity = (1.0 - total_diff / max_possible) * 100.0 if max_possible > 0 else 0.0
-    return similarity
+    return fidelity, output_path, notch_masked
 
 
 # ---------------------------------------------------------------------------
@@ -239,12 +348,13 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
         app_uri = image_to_data_uri(s.app_path)
         diff_uri = image_to_data_uri(s.diff_path) if s.diff_path else ""
         grade_color = GRADE_COLORS.get(s.grade, "#6b7280")
+        notch_note = ' <span class="notch-badge">notch masked</span>' if s.notch_masked else ""
 
         screen_rows += f"""
             <tr class="screen-row">
               <td class="screen-name">
                 <div class="name">{s.name}</div>
-                <div class="meta">Figma: {s.figma_size[0]}x{s.figma_size[1]} | App: {s.app_size[0]}x{s.app_size[1]}</div>
+                <div class="meta">Figma: {s.figma_size[0]}x{s.figma_size[1]} | App: {s.app_size[0]}x{s.app_size[1]}{notch_note}</div>
               </td>
               <td class="img-cell"><img src="{figma_uri}" alt="Figma: {s.name}" /></td>
               <td class="img-cell"><img src="{app_uri}" alt="App: {s.name}" /></td>
@@ -343,6 +453,16 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
     color: var(--text-muted);
     margin-top: 0.5rem;
   }}
+  .engine-badge {{
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-family: monospace;
+    background: rgba(157, 97, 255, 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(157, 97, 255, 0.3);
+  }}
 
   /* Legend */
   .legend {{
@@ -388,6 +508,15 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
   }}
   .screen-name .name {{ font-weight: 500; margin-bottom: 0.25rem; }}
   .screen-name .meta {{ font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }}
+  .notch-badge {{
+    display: inline-block;
+    padding: 1px 5px;
+    font-size: 0.6rem;
+    background: rgba(157, 97, 255, 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(157, 97, 255, 0.3);
+    margin-left: 4px;
+  }}
   .img-cell img {{
     max-width: 280px;
     max-height: 500px;
@@ -441,13 +570,14 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
     <div class="overall-details">
       <h2>Overall Fidelity</h2>
       <div class="pct" style="color: {overall_color}">{report.overall_fidelity:.1f}%</div>
-      <div class="summary">{len(report.screens)} screen(s) compared | threshold: {report.threshold * 100:.0f}% per channel</div>
+      <div class="summary">{len(report.screens)} screen(s) compared</div>
+      <div class="engine-badge">{report.engine}</div>
     </div>
   </div>
 
   <div class="legend">
-    <div class="legend-item"><span class="legend-swatch" style="background: rgba(0,200,0,0.4)"></span> Matches design</div>
-    <div class="legend-item"><span class="legend-swatch" style="background: rgba(220,40,40,0.8)"></span> Diverges from design</div>
+    <div class="legend-item"><span class="legend-swatch" style="background: rgba(255,0,80,0.7)"></span> Diverges from design</div>
+    <div class="legend-item"><span class="legend-swatch" style="background: rgba(255,190,0,0.7)"></span> Anti-aliased (ignored)</div>
   </div>
 
   <table>
@@ -483,13 +613,12 @@ def generate_markdown_report(report: Report, output_dir: Path) -> Path:
     """Produce a Markdown report suitable for PR comments."""
     md_path = output_dir / "report.md"
 
-    overall_emoji = {"A": "+", "B": "+", "C": "~", "D": "-", "F": "-"}.get(report.overall_grade, "")
     lines = [
-        f"## Design Compliance Report",
+        "## Design Compliance Report",
         "",
         f"**Overall Fidelity: {report.overall_fidelity:.1f}% (Grade {report.overall_grade})**",
         "",
-        f"Threshold: {report.threshold * 100:.0f}% per channel | {len(report.screens)} screen(s) compared",
+        f"Engine: {report.engine} | {len(report.screens)} screen(s) compared",
         "",
         "| Screen | Fidelity | Grade | Status |",
         "|--------|----------|-------|--------|",
@@ -529,12 +658,7 @@ def generate_markdown_report(report: Report, output_dir: Path) -> Path:
 
 
 def match_screens(figma_dir: Path, app_dir: Path) -> list[tuple[str, Path, Path]]:
-    """
-    Match Figma frames to app screenshots by filename.
-
-    Both directories are expected to contain PNGs with sanitized filenames
-    (produced by fetch_figma.py and capture.py respectively).
-    """
+    """Match Figma frames to app screenshots by filename."""
     figma_files = {p.stem: p for p in figma_dir.glob("*.png")}
     app_files = {p.stem: p for p in app_dir.glob("*.png")}
 
@@ -544,7 +668,6 @@ def match_screens(figma_dir: Path, app_dir: Path) -> list[tuple[str, Path, Path]
 
     for name, fpath in sorted(figma_files.items()):
         if name in app_files:
-            # Reconstruct a display name from the slug
             display_name = name.replace("_", " ").title()
             matched.append((display_name, fpath, app_files[name]))
         else:
@@ -555,12 +678,18 @@ def match_screens(figma_dir: Path, app_dir: Path) -> list[tuple[str, Path, Path]
             unmatched_app.append(name)
 
     if unmatched_figma:
-        print(f"WARN: {len(unmatched_figma)} Figma frame(s) with no matching app screenshot:", file=sys.stderr)
+        print(
+            f"WARN: {len(unmatched_figma)} Figma frame(s) with no matching app screenshot:",
+            file=sys.stderr,
+        )
         for n in unmatched_figma:
             print(f"  - {n}", file=sys.stderr)
 
     if unmatched_app:
-        print(f"WARN: {len(unmatched_app)} app screenshot(s) with no matching Figma frame:", file=sys.stderr)
+        print(
+            f"WARN: {len(unmatched_app)} app screenshot(s) with no matching Figma frame:",
+            file=sys.stderr,
+        )
         for n in unmatched_app:
             print(f"  - {n}", file=sys.stderr)
 
@@ -571,7 +700,9 @@ def run_diff(
     figma_dir: Path,
     app_dir: Path,
     output_dir: Path,
-    threshold: float = 0.05,
+    threshold: float = 0.1,
+    platform: str = "ios",
+    mask_statusbar: bool = True,
 ) -> Report:
     """Compare all matched screens and build a Report."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -583,11 +714,16 @@ def run_diff(
         print("ERROR: No matching Figma/app screenshot pairs found.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Comparing {len(matched)} screen(s) ...\n")
+    engine = "pixelmatch (anti-aliasing aware, YIQ)" if HAS_PIXELMATCH else "pillow (basic)"
+    masking = f"status bar masked ({platform})" if mask_statusbar else "no masking"
+    print(f"Engine:  {engine}")
+    print(f"Masking: {masking}")
+    print(f"\nComparing {len(matched)} screen(s) ...\n")
 
     report = Report(
         timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         threshold=threshold,
+        engine=engine,
     )
 
     for display_name, figma_path, app_path in matched:
@@ -607,17 +743,22 @@ def run_diff(
             diff_filename = f"{sanitize_filename(display_name)}_diff.png"
             diff_path = diffs_dir / diff_filename
 
-            fidelity, _ = compute_diff(figma_path, app_path, diff_path, threshold)
-            structural = compute_structural_similarity(figma_path, app_path)
+            fidelity, _, notch_masked = compute_diff(
+                figma_img,
+                app_img,
+                diff_path,
+                threshold=threshold,
+                platform=platform,
+                mask_statusbar=mask_statusbar,
+            )
 
-            # Blend pixel fidelity (70%) with structural similarity (30%)
-            blended = fidelity * 0.7 + structural * 0.3
-
-            result.fidelity = blended
-            result.grade = compute_grade(blended)
+            result.fidelity = fidelity
+            result.grade = compute_grade(fidelity)
             result.diff_path = diff_path
+            result.notch_masked = notch_masked
 
-            print(f"    Pixel: {fidelity:.1f}% | Structural: {structural:.1f}% | Blended: {blended:.1f}% [{result.grade}]")
+            mask_label = " [notch masked]" if notch_masked else ""
+            print(f"    Fidelity: {fidelity:.1f}% [{result.grade}]{mask_label}")
 
         except Exception as exc:
             result.error = str(exc)
@@ -625,7 +766,7 @@ def run_diff(
 
         report.screens.append(result)
 
-    # Overall score — average of successful screens
+    # Overall score
     valid_scores = [s.fidelity for s in report.screens if s.error is None]
     if valid_scores:
         report.overall_fidelity = sum(valid_scores) / len(valid_scores)
@@ -649,8 +790,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--threshold",
         type=float,
-        default=0.05,
-        help="Per-channel tolerance (0-1). Pixels within this tolerance are considered matching. (default: 0.05)",
+        default=0.1,
+        help="Pixelmatch threshold (0-1). Controls color distance sensitivity. (default: 0.1)",
+    )
+    p.add_argument(
+        "--platform",
+        choices=["ios", "android"],
+        default="ios",
+        help="Platform (controls status bar mask height). Default: ios.",
+    )
+    p.add_argument(
+        "--no-mask-statusbar",
+        action="store_true",
+        help="Disable status bar / notch masking.",
     )
     return p
 
@@ -669,7 +821,14 @@ def main(argv: list[str] | None = None) -> None:
         print(f"ERROR: App screenshots directory not found: {app_dir}", file=sys.stderr)
         sys.exit(1)
 
-    report = run_diff(figma_dir, app_dir, output_dir, threshold=args.threshold)
+    report = run_diff(
+        figma_dir,
+        app_dir,
+        output_dir,
+        threshold=args.threshold,
+        platform=args.platform,
+        mask_statusbar=not args.no_mask_statusbar,
+    )
 
     print(f"\n{'='*60}")
     print(f"  Overall Fidelity:  {report.overall_fidelity:.1f}%")

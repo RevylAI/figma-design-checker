@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/Colors';
 
 const { width, height } = Dimensions.get('window');
@@ -22,32 +21,11 @@ export default function LandingScreen() {
 
       {/* Illustration area */}
       <View style={styles.illustrationArea}>
-        <LinearGradient
-          colors={['#F0ECFF', '#E8E4F8', '#DDD8F0']}
-          style={styles.illustrationBg}
-        >
-          {/* Lamp */}
-          <View style={styles.lampBase}>
-            <View style={styles.lampShade} />
-            <View style={styles.lampStand} />
-          </View>
-          {/* Couch */}
-          <View style={styles.couch}>
-            <View style={styles.couchBack} />
-            <View style={styles.couchSeat} />
-          </View>
-          {/* Plant */}
-          <View style={styles.plant}>
-            <View style={styles.leaf} />
-            <View style={[styles.leaf, { transform: [{ rotate: '30deg' }] }]} />
-            <View style={[styles.leaf, { transform: [{ rotate: '-30deg' }] }]} />
-          </View>
-          {/* Person silhouette */}
-          <View style={styles.person}>
-            <View style={styles.personHead} />
-            <View style={styles.personBody} />
-          </View>
-        </LinearGradient>
+        <Image
+          source={require('../assets/images/signin_city_illustration.png')}
+          style={styles.illustrationImage}
+          resizeMode="contain"
+        />
       </View>
 
       {/* Text */}
@@ -110,84 +88,13 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.38,
     marginTop: 10,
-  },
-  illustrationBg: {
-    flex: 1,
-    justifyContent: 'flex-end',
+    backgroundColor: '#F5F5F0',
     alignItems: 'center',
-    overflow: 'hidden',
+    justifyContent: 'center',
   },
-  lampBase: {
-    position: 'absolute',
-    left: 50,
-    bottom: 60,
-    alignItems: 'center',
-  },
-  lampShade: {
-    width: 40,
-    height: 50,
-    backgroundColor: '#F5DEB3',
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  lampStand: {
-    width: 4,
-    height: 80,
-    backgroundColor: '#D4C4A0',
-  },
-  couch: {
-    position: 'absolute',
-    bottom: 20,
-    alignItems: 'center',
-  },
-  couchBack: {
-    width: 160,
-    height: 70,
-    backgroundColor: '#7B7CC4',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  couchSeat: {
-    width: 180,
-    height: 40,
-    backgroundColor: '#6B6CB4',
-    borderRadius: 10,
-    marginTop: -5,
-  },
-  plant: {
-    position: 'absolute',
-    left: 60,
-    bottom: 30,
-    alignItems: 'center',
-  },
-  leaf: {
-    width: 20,
-    height: 35,
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    position: 'absolute',
-    bottom: 0,
-  },
-  person: {
-    position: 'absolute',
-    bottom: 55,
-    alignItems: 'center',
-  },
-  personHead: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#F5DEB3',
-  },
-  personBody: {
-    width: 60,
-    height: 40,
-    backgroundColor: '#D4E4F7',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -5,
+  illustrationImage: {
+    width: width,
+    height: '100%',
   },
   heading: {
     fontSize: 30,

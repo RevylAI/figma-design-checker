@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 
@@ -41,51 +40,40 @@ export default function MeditateScreen() {
           ))}
         </ScrollView>
 
-        {/* Daily Calm banner */}
+        {/* Daily Calm banner - image has text+button baked in */}
         <TouchableOpacity style={styles.dailyBanner}>
-          <LinearGradient
-            colors={['#FFC97E', '#F8B566']}
-            style={styles.dailyGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
-            <View style={styles.dailyWave} />
-            <View>
-              <Text style={styles.dailyTitle}>Daily Calm</Text>
-              <Text style={styles.dailySub}>APR 30  •  PAUSE PRACTICE</Text>
-            </View>
-            <View style={styles.dailyPlayBtn}>
-              <Ionicons name="play" size={16} color="#FFFFFF" />
-            </View>
-          </LinearGradient>
+          <Image
+            source={require('../../assets/images/meditate_daily_calm_banner.png')}
+            style={styles.dailyBannerFull}
+            resizeMode="cover"
+          />
         </TouchableOpacity>
 
         {/* Meditation grid */}
         <View style={styles.gridRow}>
-          {/* 7 Days of Calm */}
+          {/* 7 Days of Calm - image has title baked in */}
           <TouchableOpacity
             style={styles.gridCard}
             onPress={() => router.push('/course-details')}
           >
-            <LinearGradient
-              colors={['#8E97FD', '#A5AEF7']}
-              style={styles.gridImage}
-            >
-              <View style={styles.gridBlob1} />
-              <View style={styles.gridBlob2} />
-            </LinearGradient>
-            <Text style={styles.gridTitle}>7 Days of Calm</Text>
+            <View style={styles.gridImageContainer}>
+              <Image
+                source={require('../../assets/images/meditate_7days_calm_card.png')}
+                style={styles.gridImage}
+                resizeMode="cover"
+              />
+            </View>
           </TouchableOpacity>
 
-          {/* Anxiet Release */}
+          {/* Anxiety Release - illustration only, no text in image */}
           <TouchableOpacity style={styles.gridCard}>
-            <LinearGradient
-              colors={['#F8A959', '#FAC480']}
-              style={styles.gridImage}
-            >
-              <View style={styles.gridTree} />
-              <View style={styles.gridSun} />
-            </LinearGradient>
+            <View style={styles.gridImageContainer}>
+              <Image
+                source={require('../../assets/images/meditate_anxiety_release_card.png')}
+                style={styles.gridImage}
+                resizeMode="cover"
+              />
+            </View>
             <Text style={styles.gridTitle}>Anxiet Release</Text>
           </TouchableOpacity>
         </View>
@@ -93,21 +81,23 @@ export default function MeditateScreen() {
         {/* Second row */}
         <View style={styles.gridRow}>
           <TouchableOpacity style={styles.gridCard}>
-            <LinearGradient
-              colors={['#A0E4CB', '#7DD4B5']}
-              style={styles.gridImage}
-            >
-              <View style={styles.gridBlob1} />
-            </LinearGradient>
+            <View style={[styles.gridImageContainer, { backgroundColor: '#A0E4CB' }]}>
+              <Image
+                source={require('../../assets/images/meditate_illustration_1.png')}
+                style={styles.gridImage}
+                resizeMode="cover"
+              />
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.gridCard}>
-            <LinearGradient
-              colors={['#F09EA1', '#E88C8F']}
-              style={styles.gridImage}
-            >
-              <View style={styles.gridBlob2} />
-            </LinearGradient>
+            <View style={[styles.gridImageContainer, { backgroundColor: '#F09EA1' }]}>
+              <Image
+                source={require('../../assets/images/meditate_illustration_2.png')}
+                style={styles.gridImage}
+                resizeMode="cover"
+              />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -169,44 +159,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 16,
     overflow: 'hidden',
-  },
-  dailyGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 20,
     height: 90,
-    position: 'relative',
-    overflow: 'hidden',
   },
-  dailyWave: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 150,
-    height: 60,
-    backgroundColor: 'rgba(255,100,100,0.3)',
-    borderTopLeftRadius: 80,
-  },
-  dailyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textDark,
-  },
-  dailySub: {
-    fontSize: 11,
-    color: 'rgba(63,65,78,0.6)',
-    letterSpacing: 0.5,
-    marginTop: 4,
-  },
-  dailyPlayBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.textDark,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingLeft: 3,
+  dailyBannerFull: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
   },
   gridRow: {
     flexDirection: 'row',
@@ -217,47 +175,16 @@ const styles = StyleSheet.create({
   gridCard: {
     width: CARD_WIDTH,
   },
-  gridImage: {
+  gridImageContainer: {
     width: '100%',
     height: CARD_WIDTH * 0.95,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
     overflow: 'hidden',
     position: 'relative',
   },
-  gridBlob1: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  gridBlob2: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    position: 'absolute',
-    top: 15,
-    right: 20,
-  },
-  gridTree: {
-    width: 8,
-    height: 50,
-    backgroundColor: '#8B4513',
-    borderRadius: 4,
-    position: 'absolute',
-    right: 40,
-    bottom: 20,
-  },
-  gridSun: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    position: 'absolute',
-    left: 20,
-    top: 15,
+  gridImage: {
+    width: '100%',
+    height: '100%',
   },
   gridTitle: {
     fontSize: 16,

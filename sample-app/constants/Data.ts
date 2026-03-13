@@ -1,10 +1,11 @@
 export const TOPICS = [
-  { id: '1', title: 'Reduce Stress', color: '#8E97FD', emoji: '🧘‍♀️' },
-  { id: '2', title: 'Improve\nPerformance', color: '#F05D48', emoji: '💼' },
-  { id: '3', title: 'Increase\nHappiness', color: '#F8A959', emoji: '😊' },
-  { id: '4', title: 'Reduce Anxiety', color: '#FFC97E', emoji: '😰' },
-  { id: '5', title: 'Personal\nGrowth', color: '#56B68B', emoji: '🏔️' },
-  { id: '6', title: 'Better Sleep', color: '#1F265E', emoji: '😴' },
+  { id: '1', title: 'Reduce Stress', color: '#8E97FD', emoji: '🧘‍♀️', illustration: 'choose_topic_meditation_illustration' },
+  { id: '2', title: 'Improve\nPerformanee', color: '#F05D48', emoji: '💼', illustration: 'choose_topic_tree_illustration' },
+  { id: '3', title: 'Increase\nHappiness', color: '#F8A959', emoji: '😊', illustration: 'choose_topic_leaf_illustration' },
+  { id: '4', title: 'Reduce Anxiety', color: '#FFC97E', emoji: '😰', illustration: 'choose_topic_person_illustration' },
+  { id: '5', title: 'Personal\nGrowth', color: '#56B68B', emoji: '🏔️', illustration: 'choose_topic_personal_growth_card' },
+  { id: '6', title: 'Better Sleep', color: '#1F265E', emoji: '😴', illustration: 'choose_topic_nature_illustration' },
+  { id: '7', title: 'Better Focus', color: '#4E5567', emoji: '🎯', illustration: 'choose_topic_better_focus_card' },
 ];
 
 export const MEDITATION_CATEGORIES = [

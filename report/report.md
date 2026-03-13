@@ -1,20 +1,20 @@
 ## Design Compliance Report
 
-**Overall Fidelity: 66.9% (Grade F)**
+**Overall Fidelity: 73.9% (Grade D)**
 
-Threshold: 8% per channel | 9 screen(s) compared
+Engine: pixelmatch (anti-aliasing aware, YIQ) | 9 screen(s) compared
 
 | Screen | Fidelity | Grade | Status |
 |--------|----------|-------|--------|
-| Choose Topic | 60.1% | F | Needs review |
-| Course Details | 67.9% | F | Needs review |
-| Home | 71.3% | D | Needs review |
-| Meditate V2 | 59.5% | F | Needs review |
-| Reminders | 90.2% | B | Pass |
-| Sign Up | 80.3% | C | Needs review |
-| Sign Up And Sign In | 69.3% | F | Needs review |
-| Sleep | 34.3% | F | Needs review |
-| Welcome | 69.4% | F | Needs review |
+| Choose Topic | 57.4% | F | Needs review |
+| Course Details | 84.6% | C | Needs review |
+| Home | 74.1% | D | Needs review |
+| Meditate V2 | 65.1% | F | Needs review |
+| Reminders | 92.2% | B | Pass |
+| Sign Up | 82.2% | C | Needs review |
+| Sign Up And Sign In | 78.9% | D | Needs review |
+| Sleep | 54.0% | F | Needs review |
+| Welcome | 76.3% | D | Needs review |
 
 ### Grade Scale
 
@@ -26,4 +26,4 @@ Threshold: 8% per channel | 9 screen(s) compared
 | D | 70 - 80% |
 | F | < 70% |
 
-*Generated on 2026-03-12 23:19:17 UTC*
+*Generated on 2026-03-13 00:37:48 UTC*

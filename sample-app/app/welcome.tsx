@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/Colors';
@@ -43,12 +43,11 @@ export default function WelcomeScreen() {
         <View style={styles.semicircle} />
 
         {/* Person meditating */}
-        <View style={styles.meditatingPerson}>
-          <View style={styles.personHead} />
-          <View style={styles.personTorso} />
-          <View style={styles.personLegs} />
-          <View style={styles.personHandsJoined} />
-        </View>
+        <Image
+          source={require('../assets/images/welcome_yoga_illustration.png')}
+          style={styles.yogaIllustration}
+          resizeMode="contain"
+        />
       </View>
 
       {/* Button */}
@@ -135,39 +134,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 40,
   },
-  meditatingPerson: {
-    alignItems: 'center',
+  yogaIllustration: {
+    width: 280,
+    height: 280,
     position: 'absolute',
-    bottom: 40,
-  },
-  personHead: {
-    width: 45,
-    height: 45,
-    borderRadius: 23,
-    backgroundColor: '#F5DEB3',
-  },
-  personTorso: {
-    width: 70,
-    height: 60,
-    backgroundColor: '#F5DEB3',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -8,
-  },
-  personLegs: {
-    width: 120,
-    height: 40,
-    backgroundColor: '#3F414E',
-    borderRadius: 20,
-    marginTop: -5,
-  },
-  personHandsJoined: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#F5DEB3',
-    position: 'absolute',
-    top: 70,
+    bottom: 20,
   },
   button: {
     width: width - 80,

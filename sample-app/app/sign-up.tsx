@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,9 +16,12 @@ export default function SignUpScreen() {
         <Ionicons name="chevron-back" size={24} color={Colors.textDark} />
       </TouchableOpacity>
 
-      {/* Decorative curves */}
-      <View style={styles.curve1} />
-      <View style={styles.curve2} />
+      {/* Decorative background blobs */}
+      <Image
+        source={require('../assets/images/signup_background_blobs.png')}
+        style={styles.backgroundBlobs}
+        resizeMode="contain"
+      />
 
       <Text style={styles.heading}>Create your account</Text>
 
@@ -98,23 +101,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  curve1: {
+  backgroundBlobs: {
     position: 'absolute',
-    top: -80,
-    right: -40,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: '#F5F5F0',
-  },
-  curve2: {
-    position: 'absolute',
-    top: -20,
-    left: -60,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: '#F5F5F0',
+    top: -50,
+    right: -30,
+    width: 300,
+    height: 300,
+    opacity: 0.6,
   },
   heading: {
     fontSize: 28,
@@ -179,8 +172,8 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    height: 50,
-    backgroundColor: Colors.inputBg,
+    height: 55,
+    backgroundColor: '#F2F3F7',
     borderRadius: 15,
     paddingHorizontal: 20,
     paddingRight: 50,
@@ -190,7 +183,7 @@ const styles = StyleSheet.create({
   checkIcon: {
     position: 'absolute',
     right: 16,
-    top: 14,
+    top: 16,
   },
   privacyRow: {
     flexDirection: 'row',

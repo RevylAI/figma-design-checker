@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/Colors';
@@ -8,13 +8,27 @@ const { width } = Dimensions.get('window');
 const CARD_GAP = 16;
 const CARD_WIDTH = (width - 40 - CARD_GAP) / 2;
 
+const ILLUSTRATION_MAP: Record<string, any> = {
+  choose_topic_meditation_illustration: require('../assets/images/choose_topic_meditation_illustration.png'),
+  choose_topic_personal_growth_card: require('../assets/images/choose_topic_personal_growth_card.png'),
+  choose_topic_better_focus_card: require('../assets/images/choose_topic_better_focus_card.png'),
+  choose_topic_tree_illustration: require('../assets/images/choose_topic_tree_illustration.png'),
+  choose_topic_leaf_illustration: require('../assets/images/choose_topic_leaf_illustration.png'),
+  choose_topic_person_illustration: require('../assets/images/choose_topic_person_illustration.png'),
+  choose_topic_nature_illustration: require('../assets/images/choose_topic_nature_illustration.png'),
+};
+
 export default function ChooseTopicScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Decorative curve */}
-      <View style={styles.curve} />
+      {/* Decorative wave/circle */}
+      <Image
+        source={require('../assets/images/choose_topic_decorative_wave.png')}
+        style={styles.decorativeWave}
+        resizeMode="contain"
+      />
 
       <Text style={styles.heading}>
         <Text style={styles.headingBold}>What Brings you</Text>
@@ -38,7 +52,15 @@ export default function ChooseTopicScreen() {
               index % 2 === 1 && { marginTop: 20 },
             ]}
           >
-            <Text style={styles.cardEmoji}>{item.emoji}</Text>
+            {item.illustration && ILLUSTRATION_MAP[item.illustration] ? (
+              <Image
+                source={ILLUSTRATION_MAP[item.illustration]}
+                style={styles.cardIllustration}
+                resizeMode="cover"
+              />
+            ) : (
+              <Text style={styles.cardEmoji}>{item.emoji}</Text>
+            )}
             <Text
               style={[
                 styles.cardTitle,
@@ -60,14 +82,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundWhite,
     paddingHorizontal: 20,
   },
-  curve: {
+  decorativeWave: {
     position: 'absolute',
-    top: -30,
-    right: -30,
+    top: 0,
+    right: 0,
     width: 180,
     height: 180,
-    borderRadius: 90,
-    backgroundColor: '#F5F5F0',
   },
   heading: {
     fontSize: 28,
@@ -97,6 +117,15 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'flex-end',
     marginBottom: CARD_GAP,
+    overflow: 'hidden',
+  },
+  cardIllustration: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
   },
   cardEmoji: {
     fontSize: 60,
@@ -109,5 +138,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: Colors.textDark,
+    zIndex: 1,
   },
 });

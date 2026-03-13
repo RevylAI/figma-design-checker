@@ -1,0 +1,595 @@
+{
+  "figma_file_key": "WKoArA6uIxvcNKJcvyzY2c",
+  "app_name": "Silent Moon",
+  "export_scale": 3,
+  "export_format": "png",
+  "generated_at": "2026-03-12",
+  "screens": {
+    "home": {
+      "figma_node_id": "1:2",
+      "screen_reference": "screen_home.png",
+      "dimensions": "828x1792"
+    },
+    "welcome": {
+      "figma_node_id": "1:3480",
+      "screen_reference": "screen_welcome.png",
+      "dimensions": "828x1792"
+    },
+    "sleep": {
+      "figma_node_id": "3:2",
+      "screen_reference": "screen_sleep.png",
+      "dimensions": "828x1792"
+    },
+    "meditate_v2": {
+      "figma_node_id": "1:1192",
+      "screen_reference": "screen_meditate_v2.png",
+      "dimensions": "828x1792"
+    },
+    "course_details": {
+      "figma_node_id": "1:1462",
+      "screen_reference": "screen_course_details.png",
+      "dimensions": "828x1792"
+    },
+    "choose_topic": {
+      "figma_node_id": "1:1608",
+      "screen_reference": "screen_choose_topic.png",
+      "dimensions": "828x1792"
+    },
+    "reminders": {
+      "figma_node_id": "1:3427",
+      "screen_reference": "screen_reminders.png",
+      "dimensions": "828x1792"
+    },
+    "sign_up": {
+      "figma_node_id": "1:3608",
+      "screen_reference": "screen_sign_up.png",
+      "dimensions": "828x1792"
+    },
+    "sign_up_and_sign_in": {
+      "figma_node_id": "1:3661",
+      "screen_reference": "screen_sign_up_and_sign_in.png",
+      "dimensions": "828x1792"
+    }
+  },
+  "assets": [
+    {
+      "filename": "logo_icon.png",
+      "figma_node_id": "1:1181",
+      "figma_node_name": "logo",
+      "screen": ["home", "welcome"],
+      "role": "icon",
+      "description": "Silent Moon app logo icon (moon crescent)",
+      "dimensions": "90x90",
+      "file_size_bytes": 5484
+    },
+    {
+      "filename": "logo_full.png",
+      "figma_node_id": "1:1180",
+      "figma_node_name": "Group 17",
+      "screen": ["home", "welcome", "sign_up_and_sign_in"],
+      "role": "icon",
+      "description": "Full Silent Moon logo with text",
+      "dimensions": "500x90",
+      "file_size_bytes": 10058
+    },
+    {
+      "filename": "nav_meditate_icon.png",
+      "figma_node_id": "1:1162",
+      "figma_node_name": "Group",
+      "screen": ["home", "meditate_v2", "sleep"],
+      "role": "icon",
+      "description": "Bottom navigation meditate icon",
+      "dimensions": "54x66",
+      "file_size_bytes": 1844
+    },
+    {
+      "filename": "nav_music_icon.png",
+      "figma_node_id": "1:1168",
+      "figma_node_name": "Group",
+      "screen": ["home", "meditate_v2", "sleep"],
+      "role": "icon",
+      "description": "Bottom navigation music icon",
+      "dimensions": "78x66",
+      "file_size_bytes": 1836
+    },
+    {
+      "filename": "nav_sleep_icon.png",
+      "figma_node_id": "1:1174",
+      "figma_node_name": "Vector",
+      "screen": ["home", "meditate_v2", "sleep"],
+      "role": "icon",
+      "description": "Bottom navigation sleep moon icon",
+      "dimensions": "69x66",
+      "file_size_bytes": 1979
+    },
+    {
+      "filename": "nav_profile_icon.png",
+      "figma_node_id": "1:1177",
+      "figma_node_name": "Group",
+      "screen": ["home", "meditate_v2", "sleep"],
+      "role": "icon",
+      "description": "Bottom navigation profile/user icon",
+      "dimensions": "59x70",
+      "file_size_bytes": 1664
+    },
+    {
+      "filename": "home_basics_card_illustration.png",
+      "figma_node_id": "1:6",
+      "figma_node_name": "Group 7",
+      "screen": ["home"],
+      "role": "illustration",
+      "description": "Basics meditation card - person in yoga pose (vector illustration)",
+      "dimensions": "531x630",
+      "file_size_bytes": 33826
+    },
+    {
+      "filename": "home_relaxation_card_illustration.png",
+      "figma_node_id": "1:175",
+      "figma_node_name": "Group 8",
+      "screen": ["home"],
+      "role": "illustration",
+      "description": "Relaxation card - person meditating with birds (vector illustration)",
+      "dimensions": "531x630",
+      "file_size_bytes": 42361
+    },
+    {
+      "filename": "home_focus_card_illustration_1.png",
+      "figma_node_id": "1:328",
+      "figma_node_name": "Group 23",
+      "screen": ["home"],
+      "role": "illustration",
+      "description": "Focus meditation card - seated figure with decorative elements",
+      "dimensions": "486x478",
+      "file_size_bytes": 76054
+    },
+    {
+      "filename": "home_focus_card_illustration_2.png",
+      "figma_node_id": "1:649",
+      "figma_node_name": "Group 26",
+      "screen": ["home"],
+      "role": "illustration",
+      "description": "Focus meditation card (duplicate) - seated figure with decorative elements",
+      "dimensions": "486x478",
+      "file_size_bytes": 76055
+    },
+    {
+      "filename": "home_happiness_card_illustration.png",
+      "figma_node_id": "1:975",
+      "figma_node_name": "Group 24",
+      "screen": ["home"],
+      "role": "illustration",
+      "description": "Happiness meditation card - floral/nature elements with figure (complex vector)",
+      "dimensions": "486x339",
+      "file_size_bytes": 34479
+    },
+    {
+      "filename": "home_daily_thought_banner.png",
+      "figma_node_id": "1:159",
+      "figma_node_name": "Group 19",
+      "screen": ["home"],
+      "role": "illustration",
+      "description": "Daily Thought banner with abstract wave shapes background",
+      "dimensions": "1122x285",
+      "file_size_bytes": 21362
+    },
+    {
+      "filename": "welcome_yoga_illustration.png",
+      "figma_node_id": "1:3506",
+      "figma_node_name": "Group",
+      "screen": ["welcome"],
+      "role": "illustration",
+      "description": "Welcome screen main illustration - person sitting in yoga pose with hills/landscape",
+      "dimensions": "1290x774",
+      "file_size_bytes": 38399
+    },
+    {
+      "filename": "welcome_decorative_circle.png",
+      "figma_node_id": "1:3494",
+      "figma_node_name": "Ellipse 13",
+      "screen": ["welcome"],
+      "role": "background",
+      "description": "Large decorative circle behind the yoga illustration",
+      "dimensions": "1476x1476",
+      "file_size_bytes": 31583
+    },
+    {
+      "filename": "welcome_get_started_btn.png",
+      "figma_node_id": "1:3503",
+      "figma_node_name": "Group 6777",
+      "screen": ["welcome"],
+      "role": "icon",
+      "description": "GET STARTED button",
+      "dimensions": "1122x189",
+      "file_size_bytes": 7927
+    },
+    {
+      "filename": "welcome_cloud_1.png",
+      "figma_node_id": "1:3566",
+      "figma_node_name": "Vector 3",
+      "screen": ["welcome"],
+      "role": "illustration",
+      "description": "Small decorative cloud shape",
+      "dimensions": "214x128",
+      "file_size_bytes": 2031
+    },
+    {
+      "filename": "welcome_dot_small.png",
+      "figma_node_id": "1:3569",
+      "figma_node_name": "Ellipse 15",
+      "screen": ["welcome"],
+      "role": "illustration",
+      "description": "Small decorative dot",
+      "dimensions": "18x18",
+      "file_size_bytes": 447
+    },
+    {
+      "filename": "welcome_dot_large.png",
+      "figma_node_id": "1:3568",
+      "figma_node_name": "Ellipse 14",
+      "screen": ["welcome"],
+      "role": "illustration",
+      "description": "Larger decorative dot/circle",
+      "dimensions": "703x372",
+      "file_size_bytes": 8565
+    },
+    {
+      "filename": "sleep_illustration_1.png",
+      "figma_node_id": "3:3",
+      "figma_node_name": "Mask Group",
+      "screen": ["sleep"],
+      "role": "illustration",
+      "description": "Sleep card illustration - night scene with moon, buildings, and person sleeping (with bitmap background)",
+      "dimensions": "531x369",
+      "file_size_bytes": 51740,
+      "has_image_fill": true,
+      "image_ref": "507dcc623fb6928fe3cb3ee852b1d371269953e8"
+    },
+    {
+      "filename": "sleep_illustration_2.png",
+      "figma_node_id": "3:432",
+      "figma_node_name": "Mask Group",
+      "screen": ["sleep"],
+      "role": "illustration",
+      "description": "Sleep card illustration - night nature scene with trees and moon",
+      "dimensions": "531x369",
+      "file_size_bytes": 34666
+    },
+    {
+      "filename": "sleep_decorative_wave.png",
+      "figma_node_id": "3:619",
+      "figma_node_name": "Union",
+      "screen": ["sleep"],
+      "role": "background",
+      "description": "Dark decorative wave/blob shape separating header from content",
+      "dimensions": "1511x826",
+      "file_size_bytes": 18380
+    },
+    {
+      "filename": "sleep_ocean_moon_card.png",
+      "figma_node_id": "3:721",
+      "figma_node_name": "Group 6823",
+      "screen": ["sleep"],
+      "role": "illustration",
+      "description": "The Ocean Moon featured card with ocean/water background image",
+      "dimensions": "1121x699",
+      "file_size_bytes": 531105,
+      "has_image_fill": true,
+      "image_ref": "56c7aa5b12d4e736074c9b92bed9b66baaf90a16"
+    },
+    {
+      "filename": "sleep_night_island_card.png",
+      "figma_node_id": "3:741",
+      "figma_node_name": "Group 6826",
+      "screen": ["sleep"],
+      "role": "illustration",
+      "description": "Night Island card - night scene illustration with nature and moon",
+      "dimensions": "531x515",
+      "file_size_bytes": 43756
+    },
+    {
+      "filename": "sleep_sweet_sleep_card.png",
+      "figma_node_id": "3:934",
+      "figma_node_name": "Group 6827",
+      "screen": ["sleep"],
+      "role": "illustration",
+      "description": "Sweet Sleep card - sleeping animals/cute characters illustration",
+      "dimensions": "531x515",
+      "file_size_bytes": 72735
+    },
+    {
+      "filename": "sleep_night_scene_bitmap.png",
+      "figma_node_id": "3:4",
+      "figma_node_name": "204 1",
+      "screen": ["sleep"],
+      "role": "background",
+      "description": "Night scene bitmap fill - sky/moon background photo",
+      "dimensions": "large_bitmap",
+      "file_size_bytes": 2115279,
+      "image_ref": "507dcc623fb6928fe3cb3ee852b1d371269953e8"
+    },
+    {
+      "filename": "sleep_ocean_scene_bitmap.png",
+      "figma_node_id": "3:725",
+      "figma_node_name": "228 1",
+      "screen": ["sleep"],
+      "role": "background",
+      "description": "Ocean/water scene bitmap fill - used in Ocean Moon card",
+      "dimensions": "large_bitmap",
+      "file_size_bytes": 3856548,
+      "image_ref": "56c7aa5b12d4e736074c9b92bed9b66baaf90a16"
+    },
+    {
+      "filename": "sleep_category_icons.png",
+      "figma_node_id": "3:656",
+      "figma_node_name": "Group 6813",
+      "screen": ["sleep"],
+      "role": "icon",
+      "description": "Sleep screen category filter icons (moon phases, sleep indicators)",
+      "dimensions": "1152x417",
+      "file_size_bytes": 10317
+    },
+    {
+      "filename": "sleep_category_tabs.png",
+      "figma_node_id": "3:672",
+      "figma_node_name": "Group 6819",
+      "screen": ["sleep"],
+      "role": "icon",
+      "description": "Sleep screen category tabs (All, My, Sleep, Anxious, Kids) with icons",
+      "dimensions": "1212x277",
+      "file_size_bytes": 32737
+    },
+    {
+      "filename": "meditate_illustration_1.png",
+      "figma_node_id": "1:1193",
+      "figma_node_name": "Mask Group",
+      "screen": ["meditate_v2"],
+      "role": "illustration",
+      "description": "Meditation card illustration - person in meditation pose with nature elements",
+      "dimensions": "530x630",
+      "file_size_bytes": 213215
+    },
+    {
+      "filename": "meditate_illustration_2.png",
+      "figma_node_id": "1:1237",
+      "figma_node_name": "Mask Group",
+      "screen": ["meditate_v2"],
+      "role": "illustration",
+      "description": "Meditation card illustration - person with tree/nature background",
+      "dimensions": "530x450",
+      "file_size_bytes": 181330
+    },
+    {
+      "filename": "meditate_7days_calm_card.png",
+      "figma_node_id": "1:1289",
+      "figma_node_name": "Group 7",
+      "screen": ["meditate_v2"],
+      "role": "illustration",
+      "description": "7 Days of Calm card with landscape illustration",
+      "dimensions": "530x630",
+      "file_size_bytes": 222642
+    },
+    {
+      "filename": "meditate_anxiety_release_card.png",
+      "figma_node_id": "1:1335",
+      "figma_node_name": "Mask Group",
+      "screen": ["meditate_v2"],
+      "role": "illustration",
+      "description": "Anxiety Release card with figure and nature illustration",
+      "dimensions": "530x501",
+      "file_size_bytes": 181410
+    },
+    {
+      "filename": "meditate_daily_calm_banner.png",
+      "figma_node_id": "1:1446",
+      "figma_node_name": "Group 19",
+      "screen": ["meditate_v2"],
+      "role": "illustration",
+      "description": "Daily Calm banner with abstract wave shapes (same style as home)",
+      "dimensions": "1122x285",
+      "file_size_bytes": 22123
+    },
+    {
+      "filename": "meditate_category_tabs.png",
+      "figma_node_id": "1:1397",
+      "figma_node_name": "Group 6819",
+      "screen": ["meditate_v2"],
+      "role": "icon",
+      "description": "Meditate screen category tabs (All, My, Sleep, Anxious, Kids) with icons",
+      "dimensions": "1212x277",
+      "file_size_bytes": 30340
+    },
+    {
+      "filename": "course_header_illustration.png",
+      "figma_node_id": "1:1463",
+      "figma_node_name": "Mask Group",
+      "screen": ["course_details"],
+      "role": "illustration",
+      "description": "Course details header - large landscape illustration with person, trees, and sky",
+      "dimensions": "1242x867",
+      "file_size_bytes": 119988
+    },
+    {
+      "filename": "course_stats_icons.png",
+      "figma_node_id": "1:1553",
+      "figma_node_name": "Group 6830",
+      "screen": ["course_details"],
+      "role": "icon",
+      "description": "Course stats section with favorites count, listening count, and icons",
+      "dimensions": "952x55",
+      "file_size_bytes": 11561
+    },
+    {
+      "filename": "course_favorite_btn.png",
+      "figma_node_id": "1:1564",
+      "figma_node_name": "Group 6846",
+      "screen": ["course_details"],
+      "role": "icon",
+      "description": "Heart/favorite action button",
+      "dimensions": "165x165",
+      "file_size_bytes": 3003
+    },
+    {
+      "filename": "course_download_btn.png",
+      "figma_node_id": "1:1570",
+      "figma_node_name": "Group 6845",
+      "screen": ["course_details"],
+      "role": "icon",
+      "description": "Download action button",
+      "dimensions": "165x165",
+      "file_size_bytes": 3003
+    },
+    {
+      "filename": "course_share_btn.png",
+      "figma_node_id": "1:1576",
+      "figma_node_name": "Group 6792",
+      "screen": ["course_details"],
+      "role": "icon",
+      "description": "Share action button",
+      "dimensions": "165x165",
+      "file_size_bytes": 2611
+    },
+    {
+      "filename": "choose_topic_decorative_wave.png",
+      "figma_node_id": "1:1609",
+      "figma_node_name": "Union",
+      "screen": ["choose_topic"],
+      "role": "background",
+      "description": "Decorative wave/blob header shape (dark theme)",
+      "dimensions": "1458x2265",
+      "file_size_bytes": 327157
+    },
+    {
+      "filename": "choose_topic_personal_growth_card.png",
+      "figma_node_id": "1:1624",
+      "figma_node_name": "Group 21",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Personal Growth topic card with plant/growth illustration",
+      "dimensions": "530x630",
+      "file_size_bytes": 58171
+    },
+    {
+      "filename": "choose_topic_meditation_illustration.png",
+      "figma_node_id": "1:2323",
+      "figma_node_name": "Mask Group",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Meditation topic card with seated figure and foliage",
+      "dimensions": "510x389",
+      "file_size_bytes": 33063
+    },
+    {
+      "filename": "choose_topic_person_illustration.png",
+      "figma_node_id": "1:2666",
+      "figma_node_name": "Group",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Person in yoga/meditation pose illustration",
+      "dimensions": "418x367",
+      "file_size_bytes": 27058
+    },
+    {
+      "filename": "choose_topic_nature_illustration.png",
+      "figma_node_id": "1:2784",
+      "figma_node_name": "Group",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Nature/leaves botanical illustration for topic card",
+      "dimensions": "528x258",
+      "file_size_bytes": 18018
+    },
+    {
+      "filename": "choose_topic_illustration_2.png",
+      "figma_node_id": "1:2884",
+      "figma_node_name": "Mask Group",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Topic card illustration with seated figure and foliage (variant)",
+      "dimensions": "492x396",
+      "file_size_bytes": 32199
+    },
+    {
+      "filename": "choose_topic_tree_illustration.png",
+      "figma_node_id": "1:3117",
+      "figma_node_name": "Frame",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Tree/bonsai illustration for topic card",
+      "dimensions": "402x315",
+      "file_size_bytes": 28868
+    },
+    {
+      "filename": "choose_topic_leaf_illustration.png",
+      "figma_node_id": "1:3212",
+      "figma_node_name": "Mask Group",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Leaf/floral pattern illustration for topic card",
+      "dimensions": "528x285",
+      "file_size_bytes": 36771
+    },
+    {
+      "filename": "choose_topic_better_focus_card.png",
+      "figma_node_id": "1:2559",
+      "figma_node_name": "Group 6790",
+      "screen": ["choose_topic"],
+      "role": "illustration",
+      "description": "Better Focus/Increase Happiness topic card with illustration",
+      "dimensions": "530x501",
+      "file_size_bytes": 35558
+    },
+    {
+      "filename": "signin_background_wave.png",
+      "figma_node_id": "1:3662",
+      "figma_node_name": "Frame",
+      "screen": ["sign_up_and_sign_in"],
+      "role": "background",
+      "description": "Sign in screen background wave/gradient shape",
+      "dimensions": "1269x1512",
+      "file_size_bytes": 22796
+    },
+    {
+      "filename": "signin_city_illustration.png",
+      "figma_node_id": "1:3677",
+      "figma_node_name": "Group",
+      "screen": ["sign_up_and_sign_in"],
+      "role": "illustration",
+      "description": "Sign in screen city/buildings skyline illustration with trees and stars",
+      "dimensions": "997x729",
+      "file_size_bytes": 78685
+    },
+    {
+      "filename": "signup_background_blobs.png",
+      "figma_node_id": "1:3610",
+      "figma_node_name": "Group 6800",
+      "screen": ["sign_up"],
+      "role": "background",
+      "description": "Sign up screen decorative blob/organic shapes background",
+      "dimensions": "1630x1123",
+      "file_size_bytes": 33387
+    }
+  ],
+  "image_fills": {
+    "507dcc623fb6928fe3cb3ee852b1d371269953e8": {
+      "used_in_nodes": ["3:4"],
+      "screen": "sleep",
+      "description": "Night sky/moon bitmap photo used as card background",
+      "downloaded_as": "sleep_night_scene_bitmap.png"
+    },
+    "56c7aa5b12d4e736074c9b92bed9b66baaf90a16": {
+      "used_in_nodes": ["3:725", "3:729", "3:730"],
+      "screen": "sleep",
+      "description": "Ocean/water scene bitmap photo used in Ocean Moon card",
+      "downloaded_as": "sleep_ocean_scene_bitmap.png"
+    }
+  },
+  "summary": {
+    "total_assets": 51,
+    "illustrations": 27,
+    "icons": 13,
+    "backgrounds": 6,
+    "screen_references": 9,
+    "bitmap_image_fills": 2,
+    "screens_covered": 9
+  }
+}

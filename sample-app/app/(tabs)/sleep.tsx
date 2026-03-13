@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { StatusBar } from 'expo-status-bar';
@@ -62,14 +61,15 @@ export default function SleepScreen() {
           style={styles.featured}
           onPress={() => router.push('/welcome-sleep')}
         >
-          <LinearGradient
-            colors={['#586894', '#8BA4D0']}
-            style={styles.featuredGradient}
-          >
+          <View style={styles.featuredGradient}>
+            <Image
+              source={require('../../assets/images/sleep_ocean_scene_bitmap.png')}
+              style={styles.featuredBackgroundImage}
+              resizeMode="cover"
+            />
             <View style={styles.lockIcon}>
               <Ionicons name="lock-closed" size={14} color="rgba(255,255,255,0.6)" />
             </View>
-            <View style={styles.featuredMoonIcon} />
             <Text style={styles.featuredTitle}>The Ocean Moon</Text>
             <Text style={styles.featuredSub}>
               Non-stop 8- hour mixes of our{'\n'}most popular sleep audio
@@ -77,40 +77,28 @@ export default function SleepScreen() {
             <TouchableOpacity style={styles.featuredStartBtn}>
               <Text style={styles.featuredStartText}>START</Text>
             </TouchableOpacity>
-            {/* Mountain silhouette */}
-            <View style={styles.mountains}>
-              <View style={styles.mountainA} />
-              <View style={styles.mountainB} />
-            </View>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
 
-        {/* Story cards grid */}
+        {/* Story cards grid - images have titles baked in */}
         <View style={styles.cardsRow}>
           <TouchableOpacity
             style={styles.storyCard}
             onPress={() => router.push('/sleep-music')}
           >
-            <LinearGradient
-              colors={['#586894', '#7B93BD']}
-              style={styles.storyImage}
-            >
-              <View style={styles.storyMoon} />
-              <View style={styles.storyCloud} />
-            </LinearGradient>
-            <Text style={styles.storyTitle}>Night Island</Text>
-            <Text style={styles.storyMeta}>45 MIN • SLEEP MUSIC</Text>
+            <Image
+              source={require('../../assets/images/sleep_night_island_card.png')}
+              style={styles.storyFullImage}
+              resizeMode="cover"
+            />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.storyCard}>
-            <LinearGradient
-              colors={['#7B68C4', '#9B8DE0']}
-              style={styles.storyImage}
-            >
-              <View style={styles.storyBranch} />
-            </LinearGradient>
-            <Text style={styles.storyTitle}>Sweet Sleep</Text>
-            <Text style={styles.storyMeta}>45 MIN • SLEEP MUSIC</Text>
+            <Image
+              source={require('../../assets/images/sleep_sweet_sleep_card.png')}
+              style={styles.storyFullImage}
+              resizeMode="cover"
+            />
           </TouchableOpacity>
         </View>
 
@@ -210,6 +198,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
+    backgroundColor: '#586894',
+  },
+  featuredBackgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   lockIcon: {
     position: 'absolute',
@@ -221,15 +219,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  featuredMoonIcon: {
-    position: 'absolute',
-    top: 12,
-    right: 40,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   featuredTitle: {
     fontSize: 28,
@@ -257,40 +246,6 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
     letterSpacing: 0.5,
   },
-  mountains: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 50,
-    flexDirection: 'row',
-  },
-  mountainA: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: width / 3,
-    borderRightWidth: width / 3,
-    borderBottomWidth: 50,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'rgba(0,30,60,0.4)',
-    position: 'absolute',
-    left: -20,
-    bottom: 0,
-  },
-  mountainB: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: width / 4,
-    borderRightWidth: width / 4,
-    borderBottomWidth: 40,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'rgba(0,20,50,0.5)',
-    position: 'absolute',
-    right: -20,
-    bottom: 0,
-  },
   cardsRow: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -300,50 +255,9 @@ const styles = StyleSheet.create({
   storyCard: {
     width: CARD_WIDTH,
   },
-  storyImage: {
+  storyFullImage: {
     width: '100%',
-    height: 130,
+    height: CARD_WIDTH * 1.05,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  storyMoon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFC97E',
-    position: 'absolute',
-    top: 20,
-    right: 30,
-  },
-  storyCloud: {
-    width: 60,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#A8D8EA',
-    position: 'absolute',
-    bottom: 30,
-    left: 20,
-  },
-  storyBranch: {
-    width: 100,
-    height: 3,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    borderRadius: 2,
-    transform: [{ rotate: '-10deg' }],
-  },
-  storyTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.textLight,
-    marginTop: 8,
-  },
-  storyMeta: {
-    fontSize: 11,
-    color: 'rgba(235,235,245,0.5)',
-    marginTop: 4,
-    letterSpacing: 0.5,
   },
 });

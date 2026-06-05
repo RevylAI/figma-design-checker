@@ -102,7 +102,7 @@ python scripts/capture_atlas.py \
 ```
 
 Each entry in the screens file maps a Figma frame to an Atlas screen — by label/id
-or a keyword search — instead of a list of taps and swipes:
+or a keyword search that resolves to one match — instead of a list of taps and swipes:
 
 ```yaml
 screens:

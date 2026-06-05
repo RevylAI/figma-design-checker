@@ -29,7 +29,7 @@ Each screen in the YAML needs a ``figma_frame`` plus exactly one Atlas selector:
         atlas_screen: storefront_home_feed     # Atlas entity_label or screen id
 
       - figma_frame: "Checkout"
-        atlas_query: "checkout payment form"    # fuzzy semantic search
+        atlas_query: "checkout"                 # must resolve to one match
 
 Optional per-screen ``group`` overrides which observation bucket to pull
 (representative | latest | most_common | distinct); defaults to --group.
@@ -62,10 +62,12 @@ REVYL = os.environ.get("REVYL_BIN", "revyl")
 GROUPS = ["representative", "latest", "most_common", "distinct"]
 GROUP_FALLBACK = GROUPS
 
-# A bare UUID, used to tell "this is already a screen id" from "this is a label".
+# A bare UUID, used to quickly tell common screen ids from labels.
 _UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I
 )
+
+ScreenIndex = dict[str, list[str]]
 
 
 def sanitize_filename(name: str) -> str:
@@ -112,23 +114,23 @@ def run_revyl_json(*args: str, check: bool = True) -> Any:
 # ---------------------------------------------------------------------------
 
 
-def load_screen_index(app: str, build: str) -> dict[str, str]:
-    """Return a label -> screen_id map from the Atlas structure."""
+def load_screen_index(app: str, build: str) -> ScreenIndex:
+    """Return a normalized label -> screen_id(s) map from the Atlas structure."""
     # `atlas map` defaults to --limit 20; raise it so apps with many screens are
     # fully indexed (an un-indexed label silently drops that screen).
     data = run_revyl_json("map", "--app", app, "--build", build, "--limit", "1000")
-    index: dict[str, str] = {}
+    index: ScreenIndex = {}
     for node in data.get("structure_nodes", []):
         label = node.get("label")
         sid = node.get("id")
         if label and sid:
-            index[label.strip().lower()] = sid
+            index.setdefault(label.strip().lower(), []).append(str(sid))
     return index
 
 
 def resolve_screen_id(
     entry: dict,
-    index: dict[str, str],
+    index: ScreenIndex,
     app: str,
     build: str,
 ) -> tuple[str | None, str]:
@@ -143,10 +145,19 @@ def resolve_screen_id(
         target = str(target).strip()
         if _UUID_RE.match(target):
             return target, "id"
-        sid = index.get(target.lower())
-        if sid:
-            return sid, f"label '{target}'"
-        return None, f"label '{target}' (not found in Atlas)"
+        target_lc = target.lower()
+        sids = index.get(target_lc, [])
+        if len(sids) == 1:
+            return sids[0], f"label '{target}'"
+        if len(sids) > 1:
+            return (
+                None,
+                f"label '{target}' is ambiguous ({len(sids)} Atlas screens: {', '.join(sids)}); use a screen id",
+            )
+        # Atlas ids are strings, not guaranteed UUIDs. If the value is not a
+        # known label, pass it through as an id so `atlas_screen` can still pin
+        # non-UUID entity ids; an invalid id will fail during observations lookup.
+        return target, f"id '{target}' (not found as label)"
 
     # 2. Fuzzy search via `atlas_query` (token-based; prefer one keyword)
     query = entry.get("atlas_query")
@@ -155,11 +166,33 @@ def resolve_screen_id(
         results = data.get("results", []) if isinstance(data, dict) else []
         if not results:
             return None, f"search '{query}' (no results)"
+        if len(results) > 1 and not entry.get("allow_ambiguous_query"):
+            labels = []
+            for result in results[:5]:
+                if not isinstance(result, dict):
+                    labels.append(repr(result))
+                    continue
+                labels.append(
+                    str(
+                        result.get("label")
+                        or result.get("display_name")
+                        or result.get("semantic_name")
+                        or result.get("id")
+                        or result.get("entity_id")
+                    )
+                )
+            return (
+                None,
+                f"search '{query}' returned {len(results)} matches ({', '.join(labels)}); "
+                "use atlas_screen or set allow_ambiguous_query: true",
+            )
         top = results[0]
-        sid = top.get("id")
+        if not isinstance(top, dict):
+            return None, f"search '{query}' returned a non-object top result"
+        sid = top.get("id") or top.get("entity_id")
         ambiguous = f" [{len(results)} matches, using top]" if len(results) > 1 else ""
         how = (
-            f"search '{query}' -> {top.get('label')} "
+            f"search '{query}' -> {top.get('label') or top.get('display_name')} "
             f"({top.get('observation_count')} obs){ambiguous}"
         )
         if not sid:
@@ -177,18 +210,22 @@ def pick_screenshot(observations: dict, group: str) -> tuple[str | None, str | N
     own representative. Returns (url, observation_id).
     """
     groups = observations.get("groups", {}) if isinstance(observations, dict) else {}
+    if not isinstance(groups, dict):
+        groups = {}
 
     order = [group] + [g for g in GROUP_FALLBACK if g != group]
     for g in order:
         items = groups.get(g)
         if isinstance(items, list) and items:
-            first = items[0]
-            url = first.get("screenshot_url")
-            if url:
-                # Raw observation buckets carry observation_id; the grouped
-                # (representative/most_common) ones expose representative_observation_id.
-                obs_id = first.get("observation_id") or first.get("representative_observation_id")
-                return url, obs_id
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                url = item.get("screenshot_url")
+                if url:
+                    # Raw observation buckets carry observation_id; the grouped
+                    # (representative/most_common) ones expose representative_observation_id.
+                    obs_id = item.get("observation_id") or item.get("representative_observation_id")
+                    return url, obs_id
 
     # Last resort: the screen-level representative shot. ``screen`` may be an
     # explicit null in the payload, so coerce to {} before .get().
@@ -232,6 +269,14 @@ def download(url: str, dest: Path, *, retries: int = 2, max_bytes: int = 25 * 10
     if tmp.exists():
         tmp.unlink()
     return False
+
+
+def remove_stale_capture(dest: Path) -> None:
+    """Ensure a failed Atlas pull cannot leave an older PNG for diff.py to match."""
+    tmp = dest.with_suffix(dest.suffix + ".part")
+    for path in (dest, tmp):
+        if path.exists():
+            path.unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -287,7 +332,15 @@ def capture_from_atlas(
 
     print(f"Loading Atlas structure for app '{app}' (build={build}) ...")
     index = load_screen_index(app, build)
-    print(f"Atlas has {len(index)} mapped screen(s): {', '.join(sorted(index)) or '(none)'}")
+    total_screen_ids = sum(len(sids) for sids in index.values())
+    duplicate_labels = {label: sids for label, sids in index.items() if len(sids) > 1}
+    print(f"Atlas has {total_screen_ids} mapped screen(s): {', '.join(sorted(index)) or '(none)'}")
+    if duplicate_labels:
+        print(
+            f"  WARN: {len(duplicate_labels)} Atlas label(s) are duplicated; "
+            "use screen ids for those mappings.",
+            file=sys.stderr,
+        )
     if not index:
         print(
             "  WARN: no screens indexed for this build. If the app has an Atlas, "
@@ -303,6 +356,7 @@ def capture_from_atlas(
         dest = output_dir / filename
 
         print(f"\n[{i}/{len(screens)}] {frame_name}")
+        remove_stale_capture(dest)
 
         screen_id, how = resolve_screen_id(screen, index, app, build)
         print(f"  Resolve: {how}")

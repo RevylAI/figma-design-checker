@@ -50,7 +50,8 @@ faster and has no flaky navigation. Use `capture.py` when there is no Atlas yet,
 or you need a screen the Atlas has not observed.
 
 The Atlas screens file maps each Figma frame to an Atlas screen by **label/id**
-(`atlas_screen:`) or a single-keyword **search** (`atlas_query:`). The Atlas
+(`atlas_screen:`) or a single-keyword **search** (`atlas_query:`) that resolves
+to one match. The Atlas
 search is token-based, not semantic — prefer one strong keyword (`checkout`),
 not a phrase (`checkout payment form`). Discover available screens and labels
 with `revyl atlas map --app "<App>" --build all` and

@@ -1,0 +1,38 @@
+# Example mapping for the Atlas-powered capture (scripts/capture_atlas.py).
+#
+# Unlike screens.yaml (which lists navigation steps for a live device), each
+# entry here just ties a Figma frame name to an Atlas screen. The Atlas already
+# explored the app, so no tap/type/swipe scripting is needed.
+#
+# Per entry:
+#   figma_frame   The Figma frame name (must match the exported PNG's name).
+#   atlas_screen  An Atlas entity_label (e.g. checkout_form) or a screen id.
+#                 -- OR --
+#   atlas_query   A fuzzy semantic search; the top Atlas match is used.
+#   group         (optional) representative | latest | most_common | distinct
+#
+# Run:
+#   python scripts/capture_atlas.py --app "Crate" --build all \
+#       --output-dir app_screenshots --screens screens.crate.yaml
+
+screens:
+  - figma_frame: "Storefront - Home"
+    atlas_screen: storefront_home_feed
+
+  - figma_frame: "Product - Detail"
+    atlas_screen: product_detail
+
+  - figma_frame: "Collection"
+    atlas_screen: product_listing_collection
+
+  - figma_frame: "Shopping Bag"
+    atlas_screen: shopping_bag
+
+  - figma_frame: "Checkout"
+    atlas_query: "checkout"
+
+  - figma_frame: "Account"
+    atlas_screen: account_hub
+
+  - figma_frame: "Order Confirmation"
+    atlas_query: "order"

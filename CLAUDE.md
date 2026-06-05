@@ -30,6 +30,33 @@ python scripts/capture.py \
 
 This boots a cloud device via Revyl CLI, navigates to each screen defined in `screens.yaml`, and saves a screenshot with a filename matching the Figma frame.
 
+#### Alternative: capture from the app's Atlas (no navigation scripting)
+
+If the app already has a Revyl **Atlas** (Revyl's auto-built map of every screen
+it has explored), skip the live device entirely and pull the screenshots
+straight from the Atlas:
+
+```bash
+python scripts/capture_atlas.py \
+  --app "$REVYL_APP_NAME" \
+  --build all \
+  --output-dir app_screenshots \
+  --screens screens.atlas.yaml
+```
+
+This produces the same `app_screenshots/<slug>.png` files and `manifest.json` as
+`capture.py`, so step 3 is identical. Use this path when an Atlas exists — it is
+faster and has no flaky navigation. Use `capture.py` when there is no Atlas yet,
+or you need a screen the Atlas has not observed.
+
+The Atlas screens file maps each Figma frame to an Atlas screen by **label/id**
+(`atlas_screen:`) or a single-keyword **search** (`atlas_query:`). The Atlas
+search is token-based, not semantic — prefer one strong keyword (`checkout`),
+not a phrase (`checkout payment form`). Discover available screens and labels
+with `revyl atlas map --app "<App>" --build all` and
+`revyl atlas search "<keyword>" --app "<App>"`. See `screens.crate.yaml` for a
+worked example.
+
 ### 3. Generate the compliance report
 
 ```bash

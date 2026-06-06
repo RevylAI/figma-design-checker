@@ -29,10 +29,13 @@ screens:
     atlas_screen: shopping_bag
 
   - figma_frame: "Checkout"
-    atlas_query: "checkout"
+    atlas_screen: checkout_form
 
   - figma_frame: "Account"
     atlas_screen: account_hub
 
+  # atlas_query must resolve to a single Atlas match. "confirmation" hits one
+  # screen; a broader word like "order" matches several and would fail (set
+  # allow_ambiguous_query: true to take the top match instead).
   - figma_frame: "Order Confirmation"
-    atlas_query: "order"
+    atlas_query: "confirmation"

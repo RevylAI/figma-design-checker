@@ -90,9 +90,11 @@ Navigation actions available:
 
 ## Interpreting the Compliance Score
 
-The fidelity score blends two metrics:
-- **Pixel fidelity (70% weight)** — Percentage of pixels that match within the threshold tolerance.
-- **Structural similarity (30% weight)** — A blurred-difference comparison that measures overall layout and contrast similarity, tolerant of minor color shifts.
+The fidelity score blends two signals so the grade reflects *design* fidelity, not raw pixel alignment. Both sub-scores are shown per screen in the report.
+- **Pixel fidelity (45% weight)** — A strict pixel-for-pixel match (pixelmatch, perceptual YIQ color distance, anti-aliased edges ignored). Catches real divergence, but on its own it punishes a faithful design that is merely shifted or scaled a few pixels, and tanks on gradients/photos that don't align exactly.
+- **Structural similarity (55% weight)** — A shift-tolerant, multi-scale perceptual similarity: each image is pooled at several downsampled scales (16/32/64/128 px wide), so small positional shifts and anti-aliasing wash out while overall layout, color, and contrast differences survive.
+
+The status bar is masked on both images before scoring, and the Figma frame is resized to the app screenshot's dimensions. Weights live in `PIXEL_WEIGHT`/`STRUCTURAL_WEIGHT` in `scripts/diff.py`.
 
 ### Grade scale
 

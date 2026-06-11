@@ -86,6 +86,43 @@ python scripts/diff.py \
 
 Open `report/report.html` in a browser to see the results.
 
+### Faster: capture from the app's Atlas
+
+If your app already has a Revyl **[Atlas](https://docs.revyl.ai)** — Revyl's
+auto-built map of every screen it has explored — you can skip the live device
+and the per-screen navigation scripting entirely. The Atlas already screenshotted
+each screen, so step 2 becomes a few API calls instead of a flaky device walk:
+
+```bash
+python scripts/capture_atlas.py \
+  --app "Crate" \
+  --build all \
+  --output-dir app_screenshots \
+  --screens screens.crate.yaml
+```
+
+Each entry in the screens file maps a Figma frame to an Atlas screen — by label/id
+or a keyword search that resolves to one match — instead of a list of taps and swipes:
+
+```yaml
+screens:
+  - figma_frame: "Storefront - Home"
+    atlas_screen: storefront_home_feed   # Atlas entity_label or screen id
+  - figma_frame: "Checkout"
+    atlas_query: "checkout"              # token-based keyword; one match required
+```
+
+The output is identical to `capture.py` (same `app_screenshots/<slug>.png` +
+`manifest.json`), so `diff.py` is unchanged. List a populated app's screens with
+`revyl atlas map --app "Crate" --build all`.
+
+| | `capture.py` (live device) | `capture_atlas.py` (Atlas) |
+|---|---|---|
+| Needs an Atlas | No | Yes |
+| Boots a cloud device | Yes | No |
+| Navigation scripting | Per-screen `steps:` | None — just a screen label/query |
+| Best for | New/unexplored apps | Apps already mapped by Revyl |
+
 ## Example Output
 
 ```
@@ -109,6 +146,10 @@ Comparing 9 screen(s) ...
   Grade:             D
 ============================================================
 ```
+
+### How fidelity is scored
+
+Each screen gets a blended fidelity score: **45% pixel match** (strict pixelmatch) plus **55% structural similarity** (shift-tolerant, multi-scale comparison). Both sub-scores appear in the HTML and Markdown reports. Grades may run higher than a pure pixel diff for screens that look faithful but are shifted or scaled by a few pixels. Weights live in `PIXEL_WEIGHT` / `STRUCTURAL_WEIGHT` in `scripts/diff.py`.
 
 ### Compliance Grades
 

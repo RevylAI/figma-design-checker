@@ -30,6 +30,34 @@ python scripts/capture.py \
 
 This boots a cloud device via Revyl CLI, navigates to each screen defined in `screens.yaml`, and saves a screenshot with a filename matching the Figma frame.
 
+#### Alternative: capture from the app's Atlas (no navigation scripting)
+
+If the app already has a Revyl **Atlas** (Revyl's auto-built map of every screen
+it has explored), skip the live device entirely and pull the screenshots
+straight from the Atlas:
+
+```bash
+python scripts/capture_atlas.py \
+  --app "$REVYL_APP_NAME" \
+  --build all \
+  --output-dir app_screenshots \
+  --screens screens.atlas.yaml
+```
+
+This produces the same `app_screenshots/<slug>.png` files and `manifest.json` as
+`capture.py`, so step 3 is identical. Use this path when an Atlas exists — it is
+faster and has no flaky navigation. Use `capture.py` when there is no Atlas yet,
+or you need a screen the Atlas has not observed.
+
+The Atlas screens file maps each Figma frame to an Atlas screen by **label/id**
+(`atlas_screen:`) or a single-keyword **search** (`atlas_query:`) that resolves
+to one match. The Atlas
+search is token-based, not semantic — prefer one strong keyword (`checkout`),
+not a phrase (`checkout payment form`). Discover available screens and labels
+with `revyl atlas map --app "<App>" --build all` and
+`revyl atlas search "<keyword>" --app "<App>"`. See `screens.crate.yaml` for a
+worked example.
+
 ### 3. Generate the compliance report
 
 ```bash
@@ -62,9 +90,13 @@ Navigation actions available:
 
 ## Interpreting the Compliance Score
 
-The fidelity score blends two metrics:
-- **Pixel fidelity (70% weight)** — Percentage of pixels that match within the threshold tolerance.
-- **Structural similarity (30% weight)** — A blurred-difference comparison that measures overall layout and contrast similarity, tolerant of minor color shifts.
+The fidelity score blends two signals so the grade reflects *design* fidelity, not raw pixel alignment. Both sub-scores are shown per screen in the report.
+- **Pixel fidelity (45% weight)** — A strict pixel-for-pixel match (pixelmatch, perceptual YIQ color distance, anti-aliased edges ignored). Catches real divergence, but on its own it punishes a faithful design that is merely shifted or scaled a few pixels, and tanks on gradients/photos that don't align exactly.
+- **Structural similarity (55% weight)** — A shift-tolerant, multi-scale perceptual similarity: each image is pooled at several downsampled scales (16/32/64/128 px wide), so small positional shifts and anti-aliasing wash out while overall layout, color, and contrast differences survive.
+
+The status bar is masked on both images before scoring, and the Figma frame is resized to the app screenshot's dimensions. Weights live in `PIXEL_WEIGHT`/`STRUCTURAL_WEIGHT` in `scripts/diff.py`.
+
+If you previously treated fidelity as pure pixelmatch output, expect grades to shift — the structural term lifts scores for visually aligned screens with minor positional drift.
 
 ### Grade scale
 

@@ -60,6 +60,18 @@ GRADE_COLORS: dict[str, str] = {
     "F": "#ef4444",
 }
 
+# The final fidelity score blends two signals so the grade reflects *design*
+# fidelity rather than raw pixel alignment:
+#   - pixel fidelity: a strict pixel-for-pixel match (pixelmatch). Catches any
+#     real divergence, but punishes a faithful design that is merely shifted or
+#     scaled a few pixels, and tanks on gradients/photos that don't align exactly.
+#   - structural fidelity: a shift-tolerant, multi-scale perceptual similarity
+#     that measures whether the overall layout, color, and contrast match.
+# Weights sum to 1.0. Structural is weighted at least as heavily as pixel so a
+# visually-faithful screen isn't failed for sub-pixel misalignment.
+PIXEL_WEIGHT = 0.45
+STRUCTURAL_WEIGHT = 0.55
+
 # Base status bar height at 1x scale (logical pixels).
 STATUS_BAR_HEIGHT_IOS = 54  # iPhone with Dynamic Island / notch
 STATUS_BAR_HEIGHT_ANDROID = 24
@@ -80,6 +92,8 @@ class ScreenResult:
     app_path: Path
     diff_path: Path | None = None
     fidelity: float = 0.0
+    pixel_fidelity: float = 0.0
+    structural_fidelity: float = 0.0
     grade: str = "F"
     figma_size: tuple[int, int] = (0, 0)
     app_size: tuple[int, int] = (0, 0)
@@ -282,6 +296,38 @@ def _compare_pillow_fallback(
     return overlay, diff_pct, changed_pixels
 
 
+def _structural_fidelity(figma_img: Image.Image, app_img: Image.Image) -> float:
+    """Shift-tolerant perceptual similarity between two same-size images (0-100).
+
+    Each image is pooled at several downsampled scales (LANCZOS averages
+    neighborhoods), so small positional shifts and anti-aliasing wash out while
+    gross layout, color, and contrast differences survive. The score is the mean
+    per-channel agreement across scales. Coarse scales capture overall
+    layout/color blocks (very shift-tolerant); finer scales capture structure.
+    """
+    from PIL import ImageChops, ImageStat
+
+    a = figma_img.convert("RGB")
+    b = app_img.convert("RGB")
+    if a.size != b.size:
+        a = a.resize(b.size, Image.LANCZOS)
+
+    w, h = b.size
+    sims: list[float] = []
+    for s in (16, 32, 64, 128):
+        if s > w:
+            continue
+        sh = max(1, round(h * s / w))
+        aa = a.resize((s, sh), Image.LANCZOS)
+        bb = b.resize((s, sh), Image.LANCZOS)
+        mean_abs = sum(ImageStat.Stat(ImageChops.difference(aa, bb)).mean) / 3.0  # 0-255
+        sims.append(1.0 - mean_abs / 255.0)
+
+    if not sims:
+        return 0.0
+    return 100.0 * (sum(sims) / len(sims))
+
+
 def compute_diff(
     figma_img: Image.Image,
     app_img: Image.Image,
@@ -289,9 +335,13 @@ def compute_diff(
     threshold: float = 0.1,
     platform: str = "ios",
     mask_statusbar: bool = True,
-) -> tuple[float, Path, bool]:
+) -> tuple[float, float, float, Path, bool]:
     """
-    Pixel-diff two images. Returns (fidelity_pct, diff_image_path, notch_masked).
+    Compare two images and compute a blended fidelity score.
+
+    Returns (fidelity, pixel_fidelity, structural_fidelity, diff_image_path,
+    notch_masked). The blended score weights pixel match (PIXEL_WEIGHT) and
+    multi-scale structural similarity (STRUCTURAL_WEIGHT).
 
     The Figma frame is resized to match the app screenshot dimensions.
     Status bar is masked on both images if the app screenshot has one
@@ -319,10 +369,12 @@ def compute_diff(
     else:
         overlay, diff_pct, changed_px = _compare_pillow_fallback(figma_img, app_img)
 
-    fidelity = 100.0 - diff_pct
+    pixel_fidelity = 100.0 - diff_pct
+    structural_fidelity = _structural_fidelity(figma_img, app_img)
+    fidelity = PIXEL_WEIGHT * pixel_fidelity + STRUCTURAL_WEIGHT * structural_fidelity
     overlay.save(output_path, "PNG")
 
-    return fidelity, output_path, notch_masked
+    return fidelity, pixel_fidelity, structural_fidelity, output_path, notch_masked
 
 
 # ---------------------------------------------------------------------------
@@ -362,6 +414,7 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
               <td class="score-cell">
                 <div class="score" style="color: {grade_color}">{s.fidelity:.1f}%</div>
                 <div class="grade" style="background: {grade_color}">{s.grade}</div>
+                <div class="subscore">pixel {s.pixel_fidelity:.0f} · struct {s.structural_fidelity:.0f}</div>
               </td>
             </tr>"""
 
@@ -542,6 +595,12 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
     font-weight: 700;
     color: #fff;
   }}
+  .score-cell .subscore {{
+    margin-top: 0.5rem;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }}
   .error-msg {{ color: #ef4444; font-style: italic; }}
 
   /* Footer */
@@ -578,6 +637,7 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
   <div class="legend">
     <div class="legend-item"><span class="legend-swatch" style="background: rgba(255,0,80,0.7)"></span> Diverges from design</div>
     <div class="legend-item"><span class="legend-swatch" style="background: rgba(255,190,0,0.7)"></span> Anti-aliased (ignored)</div>
+    <div class="legend-item">Fidelity = {int(PIXEL_WEIGHT * 100)}% pixel + {int(STRUCTURAL_WEIGHT * 100)}% structural (shown per screen)</div>
   </div>
 
   <table>
@@ -620,16 +680,19 @@ def generate_markdown_report(report: Report, output_dir: Path) -> Path:
         "",
         f"Engine: {report.engine} | {len(report.screens)} screen(s) compared",
         "",
-        "| Screen | Fidelity | Grade | Status |",
-        "|--------|----------|-------|--------|",
+        "| Screen | Fidelity | Grade | Pixel | Structural | Status |",
+        "|--------|----------|-------|-------|------------|--------|",
     ]
 
     for s in report.screens:
         if s.error:
-            lines.append(f"| {s.name} | -- | -- | Error: {s.error} |")
+            lines.append(f"| {s.name} | -- | -- | -- | -- | Error: {s.error} |")
         else:
             status = "Pass" if s.fidelity >= 90.0 else "Needs review"
-            lines.append(f"| {s.name} | {s.fidelity:.1f}% | {s.grade} | {status} |")
+            lines.append(
+                f"| {s.name} | {s.fidelity:.1f}% | {s.grade} | "
+                f"{s.pixel_fidelity:.0f}% | {s.structural_fidelity:.0f}% | {status} |"
+            )
 
     lines += [
         "",
@@ -743,7 +806,7 @@ def run_diff(
             diff_filename = f"{sanitize_filename(display_name)}_diff.png"
             diff_path = diffs_dir / diff_filename
 
-            fidelity, _, notch_masked = compute_diff(
+            fidelity, pixel_fid, structural_fid, _, notch_masked = compute_diff(
                 figma_img,
                 app_img,
                 diff_path,
@@ -753,12 +816,15 @@ def run_diff(
             )
 
             result.fidelity = fidelity
+            result.pixel_fidelity = pixel_fid
+            result.structural_fidelity = structural_fid
             result.grade = compute_grade(fidelity)
             result.diff_path = diff_path
             result.notch_masked = notch_masked
 
             mask_label = " [notch masked]" if notch_masked else ""
-            print(f"    Fidelity: {fidelity:.1f}% [{result.grade}]{mask_label}")
+            print(f"    Fidelity: {fidelity:.1f}% [{result.grade}]  "
+                  f"(pixel {pixel_fid:.0f} / struct {structural_fid:.0f}){mask_label}")
 
         except Exception as exc:
             result.error = str(exc)

@@ -96,6 +96,8 @@ The fidelity score blends two signals so the grade reflects *design* fidelity, n
 
 The status bar is masked on both images before scoring, and the Figma frame is resized to the app screenshot's dimensions. Weights live in `PIXEL_WEIGHT`/`STRUCTURAL_WEIGHT` in `scripts/diff.py`.
 
+If you previously treated fidelity as pure pixelmatch output, expect grades to shift — the structural term lifts scores for visually aligned screens with minor positional drift.
+
 ### Grade scale
 
 | Grade | Score Range | Meaning |

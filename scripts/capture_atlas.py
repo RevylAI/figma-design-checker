@@ -9,7 +9,7 @@ already explored — and downloads the representative screenshot for each screen
 
 Because the Atlas already explored the app, there is no device to boot and no
 navigation to script: each ``screens`` entry just maps a Figma frame name to an
-Atlas screen (by label/id or a fuzzy search query).
+Atlas screen (by label/id or a token-based keyword search).
 
 The output is byte-for-byte compatible with ``capture.py``: screenshots are
 written to ``<output-dir>/<slug>.png`` (slug derived from the Figma frame name)
@@ -159,10 +159,12 @@ def resolve_screen_id(
         # non-UUID entity ids; an invalid id will fail during observations lookup.
         return target, f"id '{target}' (not found as label)"
 
-    # 2. Fuzzy search via `atlas_query` (token-based; prefer one keyword)
+    # 2. Token-based keyword search via `atlas_query` (prefer one strong keyword)
     query = entry.get("atlas_query")
     if query:
-        data = run_revyl_json("search", str(query), "--app", app, "--build", build)
+        data = run_revyl_json(
+            "search", str(query), "--app", app, "--build", build, check=False
+        )
         results = data.get("results", []) if isinstance(data, dict) else []
         if not results:
             return None, f"search '{query}' (no results)"

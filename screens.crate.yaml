@@ -8,7 +8,7 @@
 #   figma_frame   The Figma frame name (must match the exported PNG's name).
 #   atlas_screen  An Atlas entity_label (e.g. checkout_form) or a screen id.
 #                 -- OR --
-#   atlas_query   A fuzzy semantic search; must resolve to a single Atlas match.
+#   atlas_query   A token-based keyword search; must resolve to a single Atlas match.
 #   group         (optional) representative | latest | most_common | distinct
 #
 # Run:

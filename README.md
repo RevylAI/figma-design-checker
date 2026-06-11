@@ -109,7 +109,7 @@ screens:
   - figma_frame: "Storefront - Home"
     atlas_screen: storefront_home_feed   # Atlas entity_label or screen id
   - figma_frame: "Checkout"
-    atlas_query: "checkout"              # single-keyword Atlas search
+    atlas_query: "checkout"              # token-based keyword; one match required
 ```
 
 The output is identical to `capture.py` (same `app_screenshots/<slug>.png` +
@@ -146,6 +146,10 @@ Comparing 9 screen(s) ...
   Grade:             D
 ============================================================
 ```
+
+### How fidelity is scored
+
+Each screen gets a blended fidelity score: **45% pixel match** (strict pixelmatch) plus **55% structural similarity** (shift-tolerant, multi-scale comparison). Both sub-scores appear in the HTML and Markdown reports. Grades may run higher than a pure pixel diff for screens that look faithful but are shifted or scaled by a few pixels. Weights live in `PIXEL_WEIGHT` / `STRUCTURAL_WEIGHT` in `scripts/diff.py`.
 
 ### Compliance Grades
 

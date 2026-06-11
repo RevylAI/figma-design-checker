@@ -337,7 +337,11 @@ def compute_diff(
     mask_statusbar: bool = True,
 ) -> tuple[float, float, float, Path, bool]:
     """
-    Pixel-diff two images. Returns (fidelity_pct, diff_image_path, notch_masked).
+    Compare two images and compute a blended fidelity score.
+
+    Returns (fidelity, pixel_fidelity, structural_fidelity, diff_image_path,
+    notch_masked). The blended score weights pixel match (PIXEL_WEIGHT) and
+    multi-scale structural similarity (STRUCTURAL_WEIGHT).
 
     The Figma frame is resized to match the app screenshot dimensions.
     Status bar is masked on both images if the app screenshot has one
@@ -633,6 +637,7 @@ def generate_html_report(report: Report, output_dir: Path) -> Path:
   <div class="legend">
     <div class="legend-item"><span class="legend-swatch" style="background: rgba(255,0,80,0.7)"></span> Diverges from design</div>
     <div class="legend-item"><span class="legend-swatch" style="background: rgba(255,190,0,0.7)"></span> Anti-aliased (ignored)</div>
+    <div class="legend-item">Fidelity = {int(PIXEL_WEIGHT * 100)}% pixel + {int(STRUCTURAL_WEIGHT * 100)}% structural (shown per screen)</div>
   </div>
 
   <table>

@@ -430,6 +430,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(7,8,10,0.96)',
     borderTopWidth: 1,
     borderTopColor: colors.border,
+    zIndex: 40,
   },
   tabBar: {
     flexDirection: 'row',

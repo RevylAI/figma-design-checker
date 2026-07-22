@@ -1,32 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+/**
+ * Demo control: bump DEMO_STAGE from 0 → 10 for a piece-by-piece reveal.
+ * Components under src/ stay loaded — only this number changes (fast hot reload).
+ *
+ *  0 blank canvas
+ *  1 CITIZEN brand
+ *  2 empty map
+ *  3 markers
+ *  4 location chrome
+ *  5 status chip
+ *  6 Nearby sheet
+ *  7 first card
+ *  8 full feed
+ *  9 tabs
+ * 10 full interactive app
+ */
+import { DemoApp } from './src/demo/DemoApp';
+
+export const DEMO_STAGE = 10;
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Blank App</Text>
-      <Text style={styles.subtitle}>Hot reload is live — ready for the demo.</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <DemoApp stage={DEMO_STAGE} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-});

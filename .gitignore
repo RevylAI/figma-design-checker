@@ -37,6 +37,15 @@ sample-app/build/
 sample-app/*.zip
 sample-app/package-lock.json
 
+# Blank app (hot-reload demo) build artifacts
+blank-app/node_modules/
+blank-app/.expo/
+blank-app/ios/
+blank-app/android/
+blank-app/build/
+blank-app/*.zip
+blank-app/package-lock.json
+
 # Test screenshots (temp)
 test_*.png
 sample-app/package-lock.json

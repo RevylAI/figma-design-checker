@@ -5,7 +5,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Blank App</Text>
-      <Text style={styles.subtitle}>Edit App.tsx — hot reload will update this screen.</Text>
+      <Text style={styles.subtitle}>Hot reload is live — ready for the demo.</Text>
       <StatusBar style="auto" />
     </View>
   );
